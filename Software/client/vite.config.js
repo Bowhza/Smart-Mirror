@@ -6,7 +6,7 @@ import { hostIP } from './GetIP.js';
 export default defineConfig({
   plugins: [react()],
   server: {
-    host: '192.168.1.72',
+    host: `${hostIP}`,
     port: 5173,
     proxy: {
       // Proxy all requests
