@@ -1,7 +1,9 @@
+import Weather from './components/Weather';
+
 export default function App() {
   return (
     <>
-      <h1 className="">Hello World!</h1>
+      <Weather />
     </>
   );
 }
