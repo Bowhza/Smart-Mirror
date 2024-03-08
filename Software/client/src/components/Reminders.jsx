@@ -28,20 +28,11 @@ function Reminder({ reminderName, startDate, endDate }) {
 
 export default function Reminders() {
   return (
-    <div className="bg-neutral-900/[.06] border-dashed border-4 border-grey-600">
+    <div className="p-1 border-2 m-2 border-neutral-900">
+      <h2>Reminders: </h2>
       {Object.values(testReminders).map((reminder, index) => (
         <Reminder key={index} {...reminder} />
       ))}
-      {/* <table className="table-auto">
-        <thead>
-          <tr>
-            <th>Reminder</th>
-            <th>Start Date</th>
-            <th>End Date</th>
-          </tr>
-        </thead>
-        <tbody>Reminder()</tbody>
-      </table> */}
     </div>
   );
 }
