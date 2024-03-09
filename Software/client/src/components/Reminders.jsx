@@ -1,38 +1,42 @@
-const testReminders = {
-  reminder1: {
-    reminderName: 'Go home',
+const testReminders = [
+  {
+    reminderName: 'Go home, do homework.',
     startDate: 'Today',
     endDate: 'Tomorrow',
   },
-  reminder2: {
-    reminderName: 'Go to class',
+  {
+    reminderName: 'Go to class, do classwork.',
     startDate: 'Monday',
     endDate: 'April 26',
   },
-  reminder3: {
-    reminderName: 'Graduate(?)',
+  {
+    reminderName: 'Whatever happens on this day.',
     startDate: 'Now',
     endDate: 'June 26',
   },
-};
+];
 
 function Reminder({ reminderName, startDate, endDate }) {
   return (
-    <div className="flex gap-4">
-      <p>{reminderName}</p>
-      <p>{startDate}</p>
-      <p>{endDate}</p>
+    <div className="flex gap-4 justify-between p-2 rounded-md bg-neutral-800 border-neutral-500">
+      <p className="font-bold">{reminderName}</p>
+      <div className="flex gap-3">
+        <p>Start: {startDate}</p>
+        <p>End: {endDate}</p>
+      </div>
     </div>
   );
 }
 
 export default function Reminders() {
   return (
-    <div className="p-1 border-2 m-2 border-neutral-900">
-      <h2>Reminders: </h2>
-      {Object.values(testReminders).map((reminder, index) => (
-        <Reminder key={index} {...reminder} />
-      ))}
+    <div className="p-2 border-2 m-2 flex-col md:col-start-6 md:col-span-2 text-neutral-50">
+      <h1 className="font-bold text-xl pb-2">Reminders</h1>
+      <div className="flex-col space-y-2">
+        {testReminders.map((reminder, index) => (
+          <Reminder key={index} {...reminder} />
+        ))}
+      </div>
     </div>
   );
 }
