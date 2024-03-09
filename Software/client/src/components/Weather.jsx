@@ -3,7 +3,7 @@ import conditions from '../conditions.json';
 
 export default function Weather() {
   const APIKey = import.meta.env.VITE_API_KEY;
-  const [weather, setWeather] = useState(null);
+  const [weather, setWeather] = useState({});
   const [location, setLocation] = useState('Edmonton');
   const [Svg, setSvg] = useState(null);
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -31,7 +31,7 @@ export default function Weather() {
   }, []);
 
   return (
-    <div className="border-2 m-2 md:col-span-2 font-bold p-3">
+    <div className="m-2 md:col-span-2 font-bold p-3">
       {weather.current ? (
         <>
           <h2 className="text-2xl">
@@ -51,8 +51,8 @@ export default function Weather() {
               </div>
             </div>
             <div>
-              <h2 className="text-4xl" id="current-time">
-                {currentTime.toLocaleTimeString()}
+              <h2 className="text-3xl" id="current-time">
+                Local Time: {currentTime.toLocaleTimeString()}
               </h2>
             </div>
           </div>

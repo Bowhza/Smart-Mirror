@@ -30,7 +30,7 @@ function Reminder({ reminderName, startDate, endDate }) {
 
 export default function Reminders() {
   return (
-    <div className="p-2 border-2 m-2 flex-col md:col-start-6 md:col-span-2 text-neutral-50">
+    <div className="p-2 m-2 flex-col md:col-start-6 md:col-span-2 text-neutral-50">
       <h1 className="font-bold text-xl pb-2">Reminders</h1>
       <div className="flex-col space-y-2">
         {testReminders.map((reminder, index) => (
