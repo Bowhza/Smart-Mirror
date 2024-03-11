@@ -14,13 +14,20 @@ const testReminders = [
     startDate: 'Now',
     endDate: 'June 26',
   },
+
+  {
+    reminderName: 'Extra event',
+    startDate: 'Tomorrow',
+    endDate: 'December 31',
+  },
 ];
 
 function Reminder({ reminderName, startDate, endDate }) {
   return (
-    <div className="flex gap-4 justify-between p-2 rounded-md bg-neutral-800 border-neutral-500">
+    // <div className="flex gap-4 justify-between p-2 rounded-md bg-neutral-800 border-neutral-500 bg">
+    <div className="flex flex-col gap-2 p-4 rounded-md bg-gradient-to-br from-neutral-900 to-neutral-800 border border-neutral-500">
       <p className="font-bold">{reminderName}</p>
-      <div className="flex gap-3">
+      <div className="flex gap-2">
         <p>Start: {startDate}</p>
         <p>End: {endDate}</p>
       </div>
@@ -29,11 +36,12 @@ function Reminder({ reminderName, startDate, endDate }) {
 }
 
 export default function Reminders() {
+  let displayedReminders = testReminders.slice(0, 3);
   return (
     <div className="p-2 m-2 flex-col md:col-start-6 md:col-span-2 text-neutral-50">
       <h1 className="font-bold text-xl pb-2">Reminders</h1>
       <div className="flex-col space-y-2">
-        {testReminders.map((reminder, index) => (
+        {displayedReminders.map((reminder, index) => (
           <Reminder key={index} {...reminder} />
         ))}
       </div>
