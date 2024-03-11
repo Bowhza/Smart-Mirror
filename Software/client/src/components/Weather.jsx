@@ -31,35 +31,66 @@ export default function Weather() {
   }, []);
 
   return (
-    <div className="m-2 md:col-span-2 font-bold p-3">
-      {weather.current ? (
-        <>
-          <h2 className="text-2xl">
-            {weather.location.name}, {weather.location.region}
-          </h2>
-          <h3 className="text-lg">{weather.location.country}</h3>
-          <div className="flex-col">
-            <div className="flex items-center">
-              <img src={Svg} className="size-40" />
-              <div className="flex-col">
-                <h2 className="text-6xl" id="current-temp">
-                  {weather.current.temp_c}°C
-                </h2>
-                <h2 className="text-4xl" id="condition-text">
-                  {weather.current.condition.text}
+    <div className="flex-col m-2 md:col-span-2 font-bold p-3">
+      <div>
+        {weather.current ? (
+          <>
+            <h2 className="text-2xl">
+              {weather.location.name}, {weather.location.region}
+            </h2>
+            <h3 className="text-lg">{weather.location.country}</h3>
+            <div className="flex-col">
+              <div className="flex items-center">
+                <img src={Svg} className="size-40" />
+                <div className="flex-col">
+                  <h2 className="text-6xl" id="current-temp">
+                    {weather.current.temp_c}°C
+                  </h2>
+                  <h2 className="text-4xl" id="condition-text">
+                    {weather.current.condition.text}
+                  </h2>
+                </div>
+              </div>
+              <div>
+                <h2 className="text-3xl" id="current-time">
+                  Local Time: {currentTime.toLocaleTimeString()}
                 </h2>
               </div>
             </div>
-            <div>
-              <h2 className="text-3xl" id="current-time">
-                Local Time: {currentTime.toLocaleTimeString()}
-              </h2>
+          </>
+        ) : (
+          <h2>Fetching...</h2>
+        )}
+      </div>
+      {weather.forecast && <Forecast data={weather.forecast} />}
+    </div>
+  );
+}
+
+function Forecast({ data }) {
+  const [forecast, setForecast] = useState(data);
+  return (
+    <div className="flex-col pt-2">
+      <h2>Forecast</h2>
+      <div className="flex gap-5">
+        {Object.entries(forecast.forecastday).map(([key, value]) => {
+          console.log(value.date);
+          const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+          return (
+            <div key={key} className="flex-col align-center p-2 rounded-md bg-zinc-800">
+              <h2>{days[new Date(value.date).getUTCDay()]}</h2>
+              <p className="flex items-center">
+                <img src="../svgs/thermometer-warmer.svg" className="size-14 p-0" />
+                {value.day.maxtemp_c}°C
+              </p>
+              <p className="flex items-center">
+                <img src="../svgs/thermometer-colder.svg" className="size-14" />
+                {value.day.mintemp_c}°C
+              </p>
             </div>
-          </div>
-        </>
-      ) : (
-        <h2>Fetching...</h2>
-      )}
+          );
+        })}
+      </div>
     </div>
   );
 }
