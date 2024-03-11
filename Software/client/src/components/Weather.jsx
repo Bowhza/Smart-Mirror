@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import conditions from '../conditions.json';
 
 export default function Weather() {
@@ -19,7 +19,7 @@ export default function Weather() {
 
         const conditionObj = conditions.find(item => item.code == data.current.condition.code);
         const svgName = data.current.is_day ? conditionObj.day : conditionObj.night;
-        setSvg(`../public/svgs/${svgName}`);
+        setSvg(`../svgs/${svgName}`);
       });
 
     const intervalId = setInterval(() => {
@@ -32,66 +32,77 @@ export default function Weather() {
 
   return (
     <div className="flex-col m-2 md:col-span-2 font-bold p-3">
-      <div>
-        {weather.current ? (
-          <>
-            <h2 className="text-2xl">
-              {weather.location.name}, {weather.location.region}
-            </h2>
-            <h3 className="text-lg">{weather.location.country}</h3>
-            <div className="flex-col">
-              <div className="flex items-center">
-                <img src={Svg} className="size-40" />
-                <div className="flex-col">
-                  <h2 className="text-6xl" id="current-temp">
-                    {weather.current.temp_c}°C
-                  </h2>
-                  <h2 className="text-4xl" id="condition-text">
-                    {weather.current.condition.text}
-                  </h2>
-                </div>
-              </div>
-              <div>
-                <h2 className="text-3xl" id="current-time">
-                  Local Time: {currentTime.toLocaleTimeString()}
-                </h2>
-              </div>
-            </div>
-          </>
-        ) : (
-          <h2>Fetching...</h2>
-        )}
-      </div>
-      {weather.forecast && <Forecast data={weather.forecast} />}
+      {weather.forecast ? (
+        <>
+          <WeatherDisplay weather={weather} Svg={Svg} currentTime={currentTime} />
+          <Forecast data={weather.forecast} />
+        </>
+      ) : null}
     </div>
   );
 }
 
-function Forecast({ data }) {
-  const [forecast, setForecast] = useState(data);
+function WeatherDisplay({ weather, Svg, currentTime }) {
+  const { location, current } = weather;
   return (
-    <div className="flex flex-col pt-2">
-      <h2 className="text-2xl font-bold">Forecast</h2>
-      <div className="flex mt-2 gap-5">
-        {Object.entries(forecast.forecastday).map(([key, value]) => {
-          const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-          const svgName = conditions.find(item => item.code == value.day.condition.code);
+    <>
+      <h2 className="text-2xl">
+        {location.name}, {location.region}
+      </h2>
+      <h3 className="text-lg">{location.country}</h3>
+      <div className="flex-col">
+        <div className="flex items-center">
+          <img src={Svg} className="size-40" />
+          <div className="flex-col">
+            <h2 className="text-6xl" id="current-temp">
+              {current.temp_c}°C
+            </h2>
+            <h2 className="text-4xl" id="condition-text">
+              {current.condition.text}
+            </h2>
+          </div>
+        </div>
+        <div>
+          <h2 className="text-3xl" id="current-time">
+            Local Time: {currentTime.toLocaleTimeString()}
+          </h2>
+        </div>
+      </div>
+    </>
+  );
+}
 
-          return (
-            <div key={key} className="flex flex-col items-center p-2 rounded-md bg-zinc-800 w-48">
-              <h2 className="text-lg font-semibold">{days[new Date(value.date).getUTCDay()]}</h2>
-              <img src={`/svgs/${svgName.day}`} className="w-13 h-13" />
-              <div className="flex justify-between">
-                <img src="../svgs/thermometer-warmer.svg" className="w-10 h-10 self-start" />
-                <p className="flex items-center">{value.day.maxtemp_c}°C</p>
-              </div>
-              <div className="flex justify-between">
-                <img src="../svgs/thermometer-colder.svg" className="w-10 h-10 self-start" />
-                <p className="flex items-center">{value.day.mintemp_c}°C</p>
-              </div>
-            </div>
-          );
-        })}
+function Forecast({ data }) {
+  const { forecastday } = data;
+  return (
+    <div className="pt-2">
+      <h2 className="text-2xl font-bold">Forecast</h2>
+      <div className="flex gap-5 mt-2 justify-items-start">
+        {forecastday.map((value, index) => (
+          <ForecastCard key={value.date} info={value} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ForecastCard({ info }) {
+  const { date, day } = info;
+  const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const svgName = conditions.find(item => item.code == day.condition.code);
+
+  return (
+    <div className="flex flex-col items-center pt-2 pb-2 rounded-md bg-zinc-800 w-32">
+      <h2 className="text-xl font-bold">{days[new Date(date).getUTCDay()]}</h2>
+      <h3 className="text-lg font-semibold">{day.condition.text}</h3>
+      <img src={`/svgs/${svgName.day}`} className="w-2/4" alt={day.condition.text} />
+      <div className="flex justify-between">
+        <img src="../svgs/thermometer-warmer.svg" alt="Thermometer warmer" className="w-10 h-10 self-start" />
+        <p className="flex items-center">{day.maxtemp_c}°C</p>
+      </div>
+      <div className="flex justify-between">
+        <img src="../svgs/thermometer-colder.svg" alt="Thermometer colder" className="w-10 h-10 self-start" />
+        <p className="flex items-center">{day.mintemp_c}°C</p>
       </div>
     </div>
   );
