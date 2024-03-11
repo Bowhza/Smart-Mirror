@@ -70,23 +70,25 @@ export default function Weather() {
 function Forecast({ data }) {
   const [forecast, setForecast] = useState(data);
   return (
-    <div className="flex-col pt-2">
-      <h2>Forecast</h2>
-      <div className="flex gap-5">
+    <div className="flex flex-col pt-2">
+      <h2 className="text-2xl font-bold">Forecast</h2>
+      <div className="flex mt-2 gap-5">
         {Object.entries(forecast.forecastday).map(([key, value]) => {
-          console.log(value.date);
           const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+          const svgName = conditions.find(item => item.code == value.day.condition.code);
+
           return (
-            <div key={key} className="flex-col align-center p-2 rounded-md bg-zinc-800">
-              <h2>{days[new Date(value.date).getUTCDay()]}</h2>
-              <p className="flex items-center">
-                <img src="../svgs/thermometer-warmer.svg" className="size-14 p-0" />
-                {value.day.maxtemp_c}°C
-              </p>
-              <p className="flex items-center">
-                <img src="../svgs/thermometer-colder.svg" className="size-14" />
-                {value.day.mintemp_c}°C
-              </p>
+            <div key={key} className="flex flex-col items-center p-2 rounded-md bg-zinc-800 w-48">
+              <h2 className="text-lg font-semibold">{days[new Date(value.date).getUTCDay()]}</h2>
+              <img src={`/svgs/${svgName.day}`} className="w-13 h-13" />
+              <div className="flex justify-between">
+                <img src="../svgs/thermometer-warmer.svg" className="w-10 h-10 self-start" />
+                <p className="flex items-center">{value.day.maxtemp_c}°C</p>
+              </div>
+              <div className="flex justify-between">
+                <img src="../svgs/thermometer-colder.svg" className="w-10 h-10 self-start" />
+                <p className="flex items-center">{value.day.mintemp_c}°C</p>
+              </div>
             </div>
           );
         })}
