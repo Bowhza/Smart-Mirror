@@ -93,8 +93,8 @@ function ForecastCard({ info }) {
 
   return (
     <div className="flex flex-col items-center pt-2 pb-2 rounded-md bg-zinc-800 w-32">
-      <h2 className="text-xl font-bold">{days[new Date(date).getUTCDay()]}</h2>
-      <h3 className="text-lg font-semibold">{day.condition.text}</h3>
+      <h2 className="font-bold">{days[new Date(date).getUTCDay()]}</h2>
+      {/*<h3 className="text-lg font-semibold">{day.condition.text}</h3>*/}
       <img src={`/svgs/${svgName.day}`} className="w-2/4" alt={day.condition.text} />
       <div className="flex justify-between">
         <img src="../svgs/thermometer-warmer.svg" alt="Thermometer warmer" className="w-10 h-10 self-start" />
