@@ -46,10 +46,7 @@ export default function News() {
   }, []);
 
   return (
-    <div
-      className="md:col-span-7 md:flex flex-grow 
-     scrollbar-hidden overflow-x-hidden mx-5 mb-5 items-end container"
-    >
+    <div className="md:col-span-7 md:flex w-screen mx-5 mb-5 items-end container">
       <div className="scrolling-container flex gap-5">
         {newsItems ? (
           newsItems.map((article, index) => {
