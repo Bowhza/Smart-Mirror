@@ -10,7 +10,7 @@ export default function News() {
       try {
         // Check if data is already loaded from local storage
         const storedData = localStorage.getItem('myData');
-        console.log('Stored data:', storedData);
+        console.log('Stored data:', JSON.parse(storedData));
         if (storedData) {
           setData(JSON.parse(storedData));
           isDataLoaded.current = true;
@@ -42,12 +42,14 @@ export default function News() {
     if (!isDataLoaded.current) {
       fetchData();
     }
-
     console.log(data);
   }, [data]);
 
   return (
-    <div className="md:col-span-7 flex flex-grow gap-5 snap-x snap-center overflow-hidden scrollbar-hidden mx-5 mb-5 items-end">
+    <div
+      className="md:col-span-7 md:flex flex-grow gap-5 snap-x snap-center overflow-hidden 
+    scrollbar-hidden mx-5 mb-5 items-end "
+    >
       {data && data.results ? (
         data.results.map((article, index) => {
           return <Article key={index} info={article} />;
@@ -61,7 +63,7 @@ export default function News() {
 
 function Article({ info }) {
   return (
-    <div className="flex-shrink-0 w-56 h-48 rounded-md p-3 bg-zinc-800 flex-col flex justify-between">
+    <div className="flex-shrink-0 md:w-56 h-48 rounded-md p-3 bg-zinc-800 flex-col flex justify-between mt-5 border-2 border-neutral-700">
       <div>
         <h2 className="text-sm font-bold">{info.title}</h2>
         <h3 className="text-xs">{info.creator ? info.creator : 'No Author'}</h3>

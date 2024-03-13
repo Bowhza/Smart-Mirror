@@ -92,7 +92,7 @@ function ForecastCard({ info }) {
   const svgName = conditions.find(item => item.code == day.condition.code);
 
   return (
-    <div className="flex flex-col items-center pt-2 pb-2 rounded-md bg-zinc-800 w-32">
+    <div className="flex flex-col items-center pt-2 pb-2 rounded-md bg-zinc-800 w-32 border-2 border-neutral-700">
       <h2 className="font-bold">{days[new Date(date).getUTCDay()]}</h2>
       {/*<h3 className="text-lg font-semibold">{day.condition.text}</h3>*/}
       <img src={`/svgs/${svgName.day}`} className="w-2/4" alt={day.condition.text} />
