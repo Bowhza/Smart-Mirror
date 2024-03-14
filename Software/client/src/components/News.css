@@ -1,13 +1,19 @@
 .scrolling-container {
-  animation: scrollAnimation 20s linear infinite;
+  animation: scrollAnimation 360s linear infinite;
 }
 
 @keyframes scrollAnimation {
   0% {
     transform: translateX(0);
   }
+  40% {
+    transform: translateX(-78%);
+  }
   50% {
     transform: translateX(-78%);
+  }
+  90% {
+    transform: translateX(0);
   }
   100% {
     transform: translateX(0);

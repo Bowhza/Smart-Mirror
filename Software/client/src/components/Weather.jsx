@@ -133,16 +133,51 @@ function Statistic({ icon, label, value }) {
 }
 
 function Stats({ data }) {
-  const { current } = data;
+  const { location, current, forecast } = data;
+  //Used to calculate the Beaufort wind index
+  function Beaufort(kph) {
+    if (kph < 1.6) {
+      return 0; // Calm
+    } else if (kph <= 4.8) {
+      return 1; // Light air
+    } else if (kph <= 11.3) {
+      return 2; // Light breeze
+    } else if (kph <= 19.3) {
+      return 3; // Gentle breeze
+    } else if (kph <= 29) {
+      return 4; // Moderate breeze
+    } else if (kph <= 38.6) {
+      return 5; // Fresh breeze
+    } else if (kph <= 49.9) {
+      return 6; // Strong breeze
+    } else if (kph <= 61.2) {
+      return 7; // Near gale
+    } else if (kph <= 74.5) {
+      return 8; // Gale
+    } else if (kph <= 87.9) {
+      return 9; // Strong gale
+    } else if (kph <= 102.3) {
+      return 10; // Storm
+    } else if (kph <= 117.4) {
+      return 11; // Violent storm
+    } else {
+      return 12; // Hurricane force
+    }
+  }
+
+  console.log(forecast.forecastday[0].astro.sunrise);
   return (
     <div className="max-w-sm">
       <h2 className="text-2xl py-2 font-bold">Day Statistics</h2>
       <div className="text-sm md:grid md:grid-cols-3 gap-3">
         <Statistic icon="thermometer-celsius" label="Feels Like" value={`${current.feelslike_c}°C`} />
         <Statistic icon="humidity" label="Humidity" value={`${current.humidity}%`} />
-        <Statistic icon="windsock" label="Wind" value={`${current.wind_kph}kph/${current.wind_degree}°`} />
+        <Statistic icon="windsock" label="Wind Dir" value={`${current.wind_dir}/${current.wind_degree}°`} />
         <Statistic icon="barometer" label="Pressure" value={`${current.pressure_mb / 10}kPa`} />
         <Statistic icon="raindrop" label="Precip" value={`${current.precip_mm}mm`} />
+        <Statistic icon={`wind-beaufort-${Beaufort(current.wind_kph)}`} label="Wind" value={`${current.wind_kph}kph`} />
+        <Statistic icon="sunrise" label="Sunrise" value={`${forecast.forecastday[0].astro.sunrise}`} />
+        <Statistic icon="sunset" label="Sunset" value={`${forecast.forecastday[0].astro.sunset}`} />
         <Statistic icon={`uv-index-${current.uv}`} label="UV Index" value={current.uv} />
       </div>
     </div>
