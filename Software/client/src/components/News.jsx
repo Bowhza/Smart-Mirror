@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import './News.css';
+import './Animations.css';
 
 export default function News() {
   const [newsItems, setNewsItems] = useState([]);
@@ -35,14 +35,25 @@ export default function News() {
         const aggregatedNews = parsedFeeds.flatMap(parseRSS);
 
         // Update state with aggregated news
-        console.log(aggregatedNews);
         setNewsItems(aggregatedNews);
       } catch (error) {
         console.error('Error fetching news:', error);
       }
     };
 
+    //Instantly fetches the news data on render
     fetchNews();
+
+    //Fetches new news data every 10 minutes
+    const newsInterval = setInterval(
+      () => {
+        fetchNews();
+      },
+      1000 * 60 * 10,
+    );
+
+    //Cleanup function
+    return () => clearInterval(newsInterval);
   }, []);
 
   return (

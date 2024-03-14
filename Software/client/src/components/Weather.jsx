@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import conditions from '../conditions.json';
+import './Animations.css';
 
 export default function Weather() {
   const APIKey = import.meta.env.VITE_API_KEY;
@@ -9,6 +10,7 @@ export default function Weather() {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [showForecast, setShowForecast] = useState(false);
 
+  //Use effect for the weather fetching
   useEffect(() => {
     const fetchData = async () => {
       const response = await fetch(
@@ -23,31 +25,39 @@ export default function Weather() {
       const conditionObj = conditions.find(item => item.code == data.current.condition.code);
       const svgName = data.current.is_day ? conditionObj.day : conditionObj.night;
       setSvg(`../svgs/${svgName}`);
-
-      const intervalId = setInterval(() => {
-        setCurrentTime(new Date());
-      }, 1000);
-
-      // Cleanup function to clear the interval when the component unmounts
-      return () => clearInterval(intervalId);
     };
 
+    // Fetch data immediately after component mounts
     fetchData();
-  }, [APIKey, location]);
 
-  const memoizedStats = useMemo(() => {
-    return <Stats data={weather} />;
-  }, [weather]);
+    // Setup interval for fetching data every 5 minutes
+    const weatherFetch = setInterval(fetchData, 1000 * 60 * 5);
+
+    return () => clearInterval(weatherFetch);
+  }, [location]);
+
+  //Use Effect for the clock and forecast intervals
+  useEffect(() => {
+    const clockInterval = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+
+    const forecastInterval = setInterval(() => {
+      setShowForecast(show => !show);
+    }, 10000);
+
+    return () => {
+      clearInterval(clockInterval);
+      clearInterval(forecastInterval);
+    };
+  }, []);
 
   return (
     <div className="flex-col m-2 md:col-span-2 font-bold p-3">
       {weather.forecast ? (
         <>
           <WeatherDisplay weather={weather} Svg={Svg} currentTime={currentTime} />
-          {showForecast ? <Forecast data={weather.forecast} /> : memoizedStats}
-          <button className="my-5 border-2 p-2 bg-zinc-800 rounded-md" onClick={() => setShowForecast(!showForecast)}>
-            Change Display
-          </button>
+          {showForecast ? <Forecast data={weather.forecast} /> : <Stats data={weather} />}
         </>
       ) : (
         <h2>Fetching...</h2>
@@ -87,17 +97,19 @@ function WeatherDisplay({ weather, Svg, currentTime }) {
 }
 
 function Forecast({ data }) {
-  const { forecastday } = data;
-  return (
-    <div className="pt-2">
-      <h2 className="text-2xl font-bold">Forecast</h2>
-      <div className="flex gap-5 mt-2 justify-items-start">
-        {forecastday.map((value, index) => (
-          <ForecastCard key={value.date} info={value} />
-        ))}
+  return useMemo(() => {
+    const { forecastday } = data;
+    return (
+      <div className="pt-2 fade-in">
+        <h2 className="text-2xl font-bold">Forecast</h2>
+        <div className="flex gap-3 mt-2 justify-items-start">
+          {forecastday.map((value, index) => (
+            <ForecastCard key={value.date} info={value} />
+          ))}
+        </div>
       </div>
-    </div>
-  );
+    );
+  }, [data]);
 }
 
 function ForecastCard({ info }) {
@@ -108,6 +120,7 @@ function ForecastCard({ info }) {
   return (
     <div className="flex flex-col items-center pt-2 pb-2 rounded-md bg-zinc-800 w-28 border-2 border-neutral-700">
       <h2 className="font-bold text-sm">{days[new Date(date).getUTCDay()]}</h2>
+      <h3 className="text-xs">{day.condition.text}</h3>
       <img src={`/svgs/${svgName.day}`} className="w-16" alt={day.condition.text} />
       <div className="flex justify-between">
         <img src="../svgs/thermometer-warmer.svg" alt="Thermometer warmer" className="w-6 h-6 self-start" />{' '}
@@ -133,53 +146,59 @@ function Statistic({ icon, label, value }) {
 }
 
 function Stats({ data }) {
-  const { location, current, forecast } = data;
-  //Used to calculate the Beaufort wind index
-  function Beaufort(kph) {
-    if (kph < 1.6) {
-      return 0; // Calm
-    } else if (kph <= 4.8) {
-      return 1; // Light air
-    } else if (kph <= 11.3) {
-      return 2; // Light breeze
-    } else if (kph <= 19.3) {
-      return 3; // Gentle breeze
-    } else if (kph <= 29) {
-      return 4; // Moderate breeze
-    } else if (kph <= 38.6) {
-      return 5; // Fresh breeze
-    } else if (kph <= 49.9) {
-      return 6; // Strong breeze
-    } else if (kph <= 61.2) {
-      return 7; // Near gale
-    } else if (kph <= 74.5) {
-      return 8; // Gale
-    } else if (kph <= 87.9) {
-      return 9; // Strong gale
-    } else if (kph <= 102.3) {
-      return 10; // Storm
-    } else if (kph <= 117.4) {
-      return 11; // Violent storm
-    } else {
-      return 12; // Hurricane force
-    }
-  }
+  return useMemo(() => {
+    const { location, current, forecast } = data;
 
-  console.log(forecast.forecastday[0].astro.sunrise);
-  return (
-    <div className="max-w-sm">
-      <h2 className="text-2xl py-2 font-bold">Day Statistics</h2>
-      <div className="text-sm md:grid md:grid-cols-3 gap-3">
-        <Statistic icon="thermometer-celsius" label="Feels Like" value={`${current.feelslike_c}°C`} />
-        <Statistic icon="humidity" label="Humidity" value={`${current.humidity}%`} />
-        <Statistic icon="windsock" label="Wind Dir" value={`${current.wind_dir}/${current.wind_degree}°`} />
-        <Statistic icon="barometer" label="Pressure" value={`${current.pressure_mb / 10}kPa`} />
-        <Statistic icon="raindrop" label="Precip" value={`${current.precip_mm}mm`} />
-        <Statistic icon={`wind-beaufort-${Beaufort(current.wind_kph)}`} label="Wind" value={`${current.wind_kph}kph`} />
-        <Statistic icon="sunrise" label="Sunrise" value={`${forecast.forecastday[0].astro.sunrise}`} />
-        <Statistic icon="sunset" label="Sunset" value={`${forecast.forecastday[0].astro.sunset}`} />
-        <Statistic icon={`uv-index-${current.uv}`} label="UV Index" value={current.uv} />
+    //Used to calculate the Beaufort wind index
+    function Beaufort(kph) {
+      if (kph < 1.6) {
+        return 0; // Calm
+      } else if (kph <= 4.8) {
+        return 1; // Light air
+      } else if (kph <= 11.3) {
+        return 2; // Light breeze
+      } else if (kph <= 19.3) {
+        return 3; // Gentle breeze
+      } else if (kph <= 29) {
+        return 4; // Moderate breeze
+      } else if (kph <= 38.6) {
+        return 5; // Fresh breeze
+      } else if (kph <= 49.9) {
+        return 6; // Strong breeze
+      } else if (kph <= 61.2) {
+        return 7; // Near gale
+      } else if (kph <= 74.5) {
+        return 8; // Gale
+      } else if (kph <= 87.9) {
+        return 9; // Strong gale
+      } else if (kph <= 102.3) {
+        return 10; // Storm
+      } else if (kph <= 117.4) {
+        return 11; // Violent storm
+      } else {
+        return 12; // Hurricane force
+      }
+    }
+
+    return (
+      <div className="max-w-sm fade-in">
+        <h2 className="text-2xl py-2 font-bold">Day Statistics</h2>
+        <div className="text-sm md:grid md:grid-cols-3 gap-3">
+          <Statistic icon="thermometer-celsius" label="Feels Like" value={`${current.feelslike_c}°C`} />
+          <Statistic icon="humidity" label="Humidity" value={`${current.humidity}%`} />
+          <Statistic icon="windsock" label="Wind Dir" value={`${current.wind_dir}/${current.wind_degree}°`} />
+          <Statistic icon="barometer" label="Pressure" value={`${current.pressure_mb / 10}kPa`} />
+          <Statistic icon="raindrop" label="Precip" value={`${current.precip_mm}mm`} />
+          <Statistic
+            icon={`wind-beaufort-${Beaufort(current.wind_kph)}`}
+            label="Wind"
+            value={`${current.wind_kph}kph`}
+          />
+          <Statistic icon="sunrise" label="Sunrise" value={`${forecast.forecastday[0].astro.sunrise}`} />
+          <Statistic icon="sunset" label="Sunset" value={`${forecast.forecastday[0].astro.sunset}`} />
+          <Statistic icon={`uv-index-${current.uv}`} label="UV Index" value={current.uv} />
+        </div>
       </div>
-    </div>
-  );
+    );
+  }, [data]);
 }
