@@ -1,6 +1,6 @@
 # Imports for required libraries and modules
 from flask import request, jsonify
-from config import socketio, db, app, sqlalchemy
+from config import socketio, db, app, SQLException
 from models import Users, Reminders, datetime, timedelta
 
 
@@ -9,32 +9,36 @@ from models import Users, Reminders, datetime, timedelta
 def main():
     return '<h1>Hello World! Flask server is running!</h1>', 200
 
+
 # Database interaction endpoints
 # Add user to DB
-@app.route("/add_user/<username>", methods=["POST", "GET"])
+@app.route("/add_user/<username>", methods=["PUT"])
 def add_user(username):
     try:
-        newUser = Users(username)
-        db.session.add(newUser)
+        new_user = Users(username)
+        db.session.add(new_user)
         db.session.commit()
         return jsonify({"message": "user added"}), 200
-    except sqlalchemy.exc.DatabaseError:
+    except SQLException.DatabaseError:
         return "user not added", 400
 
+
 # Add reminder to DB
-@app.route("/add_reminder/<user_id>/<event_title>",
-           defaults={"date_added": datetime.now(),
-                     "end_date": datetime.now() + timedelta(days=7)})
-@app.route("/add_reminder/<user_id>/<event_title>/<date_added>/<end_date>")
-def add_reminder(user_id, event_title, date_added, end_date):
+@app.route("/add_reminder/<user_id>")
+def add_reminder(user_id):
     try:
-        newEvent = Reminders(user_id, event_title, date_added, end_date)
-        db.session.add(newEvent)
+        data = request.get_json()
+        event_title = data.get("event_title")
+        date_added = data.get("date_added")
+        end_date = data.get("end_date")
+
+        new_event = Reminders(user_id, event_title, date_added, end_date)
+        db.session.add(new_event)
         db.session.commit()
         return jsonify({"message": "event added"}), 200
+    except SQLException.DatabaseError as ex:
+        return jsonify({"message": f"{ex}"}), 400
 
-    except sqlalchemy.exc.DatabaseError as ex:
-        return jsonify({"message": "event not added"}), 400
 
 # Retrieve reminders tied to user_id
 @app.route("/find_events/<user_id>")
