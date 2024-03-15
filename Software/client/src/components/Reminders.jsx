@@ -38,24 +38,24 @@ function Reminder({ reminderName, startDate, endDate }) {
 }
 
 export default function Reminders() {
-  const [reminders, setReminders] = useState([]);
+  // const [reminders, setReminders] = useState([]);
 
-  useEffect(() => {
-    fetch('http://172.16.94.138:5174/find_reminders/1', { mode: 'cors' })
-      .then(res => res.json())
-      .then(data => {
-        console.log(data);
-        setReminders(data);
-      })
-      .catch(error => console.log(error));
-  }, []);
+  // useEffect(() => {
+  //   fetch('http://172.16.94.138:5174/get_reminders/1', { mode: 'cors' })
+  //     .then(res => res.json())
+  //     .then(data => {
+  //       console.log(data);
+  //       setReminders(data);
+  //     })
+  //     .catch(error => console.log(error));
+  // }, []);
 
-  const displayedReminders = reminders.slice(0, 5);
+  const displayedReminders = testReminders.slice(0, 5);
   return (
     <div className="m-3 flex-col md:col-start-6 md:col-span-2 text-neutral-50">
       <h1 className="font-bold text-xl pb-2">Reminders</h1>
       <div className="flex-col space-y-2">
-        {testReminders.map((reminder, index) => (
+        {displayedReminders.map((reminder, index) => (
           <Reminder key={index} {...reminder} />
         ))}
       </div>
