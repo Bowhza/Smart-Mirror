@@ -1,6 +1,7 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import App from './App.jsx';
 import { useEffect, useState } from 'react';
+import App from './App.jsx';
+import Client from './Client.jsx';
 
 const Router = () => {
   const [ip, setIp] = useState('');
@@ -19,7 +20,7 @@ const Router = () => {
   const router = createBrowserRouter([
     {
       path: '/',
-      element: ip === hostIP ? <App /> : <h1 className="text-neutral-100">Not Host Device</h1>,
+      element: ip === hostIP ? <App /> : <Client />,
     },
   ]);
   return <RouterProvider router={router} />;
