@@ -1,0 +1,8 @@
+{
+    "accelPower": false,
+    "gesturePower": true,
+    "proximityPower": true,
+    "ambientBrightnessAdj": true,
+    "defaultLocation": "Edmonton",
+    "defaultUser": "Admin"
+}

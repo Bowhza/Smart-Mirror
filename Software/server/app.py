@@ -1,12 +1,17 @@
 # Imports for required libraries and modules
 from flask import request, jsonify
-from config import socketio, db, app, SQLException
+from config import socketio, db, app, SQLException, json
 from models import Users, Reminders, datetime, timedelta
 
-
+global properties
 # Main Route
 @app.route('/')
 def main():
+    global properties
+    json_file = open("properties.json", "r")
+    json_data = json_file.read()
+    properties = json.loads(json_data)
+    print(str(properties))
     return '<h1>Hello World! Flask server is running!</h1>', 200
 
 
@@ -21,6 +26,7 @@ def add_user(username):
         return jsonify({"message": "user added"}), 200
     except SQLException.DatabaseError:
         return "user not added", 400
+
 
 @app.route("/get_users")
 def get_users():
@@ -67,6 +73,7 @@ def get_reminders(user_id):
 
     return jsonify(json_events), 200
 
+
 @app.route("/delete_reminder/<reminder_id>", methods=["DELETE"])
 def delete_reminder(reminder_id):
     try:
@@ -94,6 +101,55 @@ def delete_user_reminders(user_id):
 @app.route("/get_ip", methods=["GET"])
 def get_ip():
     return jsonify({"ip": request.remote_addr})
+
+
+@app.route("/delete_user/<user_id>")
+def delete_user(user_id):
+    if check_user_exists(user_id) is False:
+        return jsonify({"message": "user doesnt exist"}), 403
+    delete_user_reminders(user_id)
+    try:
+        user = Users.query.filter_by(user_id=user_id).first()
+        db.session.delete(user)
+        db.session.commit()
+    except SQLException.DatabaseError as ex:
+        return jsonify({"message": "user could not be deleted!"}), 403
+
+
+# Update the sensor power settings from the properties JSON file
+@app.route("/update_sensor_settings/<sensor>")
+def update_sensor_settings(sensor):
+    global properties
+
+    # const list with all compatible sensors
+    sensors = ["accel", "ambient", "gesture", "proximity"]
+
+    # if the provided sensor is not in the sensors
+    if sensor not in sensors:
+        return jsonify({"message": "sensor doesnt exist"}), 403
+
+    # append the power property name to the end of the provided sensor
+    if sensor != "ambient":
+        sensor_prop = sensor + "Power"
+
+    # append brightness adj to ambient light, as the ambient light sensor
+    # only adjusts the brightness of the display
+    else:
+        sensor_prop = sensor + "BrightnessAdj"
+
+    # flip the state of the sensor power mode
+    properties[sensor_prop] = not properties[sensor_prop]
+
+    # write the new contents to the JSON file
+    with open("properties.json", "w") as file:
+        json.dump(properties, file, indent=4)
+
+    return jsonify(properties[sensor_prop])
+
+
+@app.route("/set_user/<username>")
+def
+
 
 
 
