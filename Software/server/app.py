@@ -147,8 +147,6 @@ def update_sensor_settings(sensor):
     return jsonify(properties[sensor_prop])
 
 
-@app.route("/set_user/<username>")
-def
 
 
 
