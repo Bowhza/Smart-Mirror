@@ -1,19 +1,16 @@
 import Header from '../components/Header';
+import Card from '../components/Card';
 
 export default function ClientSettings() {
   return (
     <>
       <Header title="Settings" />
-      <div className="flex-col bg-neutral-900 flex-grow p-3">
+      <div className="flex flex-col flex-grow p-3 gap-3 drop-shadow-lg">
         <p className="font-bold text-xl">Settings Testing</p>
-        <div>
-          <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. In et felis nunc. Aenean posuere lobortis lectus,
-            in interdum ipsum posuere vel. Proin laoreet ipsum velit, ac laoreet diam sagittis a. Curabitur mi quam,
-            laoreet vel mi eu, sodales ornare enim. Suspendisse sit amet porttitor metus. Aliquam scelerisque libero in
-            justo imperdiet, vel efficitur nulla consequat. Aenean congue lacinia dolor et placerat. Nam porta est a
-            justo ultricies cursus.
-          </p>
+        <div className="flex flex-col gap-3">
+          <Card setting="Test Setting 1" />
+          <Card setting="Test Setting 2" />
+          <Card setting="Test Setting 3" />
         </div>
       </div>
     </>

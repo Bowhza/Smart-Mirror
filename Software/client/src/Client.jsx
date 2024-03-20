@@ -11,7 +11,7 @@ import ClientSettings from './Routes/ClientSettings';
 
 export default function Client() {
   return (
-    <div className="text-neutral-100 flex flex-col h-svh">
+    <div className="flex flex-col h-svh">
       <BrowserRouter>
         <Routes>
           <Route path="/" Component={ClientHome} />
@@ -50,9 +50,9 @@ const options = [
 
 function NavBar() {
   return (
-    <nav className="grid grid-cols-4 fixed bottom-0 left-0 right-0 font-bold border-t-2 border-zinc-700">
+    <nav className="grid grid-cols-4 fixed bottom-0 left-0 right-0 font-bold border-t-2">
       {options.map((item, index) => {
-        return <NavItem info={item} />;
+        return <NavItem key={index} info={item} />;
       })}
     </nav>
   );
@@ -62,9 +62,7 @@ function NavItem({ info }) {
   return (
     <NavLink
       to={info.route}
-      className={({ isActive, isPending }) =>
-        [isActive ? 'bg-zinc-600 transition duration-500' : 'bg-zinc-800'].join(' ')
-      }
+      className={({ isActive }) => (isActive ? 'bg-neutral-200 transition duration-500' : 'bg-neutral-50')}
     >
       <div className="flex flex-col items-center justify-center pt-1.5 pb-1">
         {info.icon}

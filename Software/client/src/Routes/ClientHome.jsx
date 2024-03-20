@@ -4,7 +4,7 @@ export default function ClientHome() {
   return (
     <>
       <Header title="Home" />
-      <div className="flex-col bg-neutral-900 flex-grow p-3">
+      <div className="flex-col flex-grow p-3">
         <p className="font-bold text-xl">Home Testing</p>
         <div>
           <p>

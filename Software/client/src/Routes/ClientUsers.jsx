@@ -4,7 +4,7 @@ export default function ClientUsers() {
   return (
     <>
       <Header title="Users" />
-      <div className="flex-col bg-neutral-900 flex-grow p-3">
+      <div className="flex-col flex-grow p-3">
         <p className="font-bold text-xl">Users Testing</p>
         <div>
           <p>
