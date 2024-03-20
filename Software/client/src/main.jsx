@@ -7,6 +7,6 @@ import Client from './Client.jsx';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <Client />
+    <Router />
   </React.StrictMode>,
 );

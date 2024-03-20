@@ -3,24 +3,23 @@ import { FaUsersCog } from 'react-icons/fa';
 import { IoMdSettings } from 'react-icons/io';
 import { FaHome } from 'react-icons/fa';
 
-import { BrowserRouter, NavLink, Route, Routes } from 'react-router-dom';
+import { NavLink, Route, Routes } from 'react-router-dom';
 import ClientHome from './Routes/ClientHome';
 import ClientReminders from './Routes/ClientReminders';
 import ClientUsers from './Routes/ClientUsers';
 import ClientSettings from './Routes/ClientSettings';
+import { useEffect } from 'react';
 
 export default function Client() {
   return (
     <div className="flex flex-col h-svh">
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" Component={ClientHome} />
-          <Route path="/reminders" Component={ClientReminders} />
-          <Route path="/users" Component={ClientUsers} />
-          <Route path="/settings" Component={ClientSettings} />
-        </Routes>
-        <NavBar />
-      </BrowserRouter>
+      <Routes>
+        <Route path="/" Component={ClientHome} />
+        <Route path="/reminders" Component={ClientReminders} />
+        <Route path="/users" Component={ClientUsers} />
+        <Route path="/settings" Component={ClientSettings} />
+      </Routes>
+      <NavBar />
     </div>
   );
 }
