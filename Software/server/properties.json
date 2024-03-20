@@ -1,8 +1,8 @@
 {
-    "accelPower": false,
-    "gesturePower": true,
+    "accelerometerPower": false,
+    "gesturePower": false,
     "proximityPower": true,
-    "ambientBrightnessAdj": true,
+    "ambientBrightnessAdj": false,
     "defaultLocation": "Edmonton",
-    "defaultUser": "Admin"
+    "defaultUser": "me"
 }

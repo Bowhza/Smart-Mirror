@@ -7,11 +7,6 @@ global properties
 # Main Route
 @app.route('/')
 def main():
-    global properties
-    json_file = open("properties.json", "r")
-    json_data = json_file.read()
-    properties = json.loads(json_data)
-    print(str(properties))
     return '<h1>Hello World! Flask server is running!</h1>', 200
 
 
@@ -28,6 +23,7 @@ def add_user(username):
         return "user not added", 400
 
 
+# Get all current users in the DB
 @app.route("/get_users")
 def get_users():
     users = Users.query.all()
@@ -74,6 +70,7 @@ def get_reminders(user_id):
     return jsonify(json_events), 200
 
 
+# Delete reminder from DB
 @app.route("/delete_reminder/<reminder_id>", methods=["DELETE"])
 def delete_reminder(reminder_id):
     try:
@@ -84,6 +81,7 @@ def delete_reminder(reminder_id):
 
     except SQLException.DatabaseError as ex:
         return jsonify({"message": "event couldn't be deleted!"}), 400
+
 
 # Delete user reminders from DB
 # This function can only be accessed through delete_user
@@ -98,11 +96,13 @@ def delete_user_reminders(user_id):
         return jsonify({"message": "user's events could not be deleted!"})
 
 
+# Gets the IP of the device accessing the endpoint
 @app.route("/get_ip", methods=["GET"])
 def get_ip():
     return jsonify({"ip": request.remote_addr})
 
 
+# Deletes the user from the DB
 @app.route("/delete_user/<user_id>")
 def delete_user(user_id):
     if check_user_exists(user_id) is False:
@@ -116,13 +116,17 @@ def delete_user(user_id):
         return jsonify({"message": "user could not be deleted!"}), 403
 
 
+# properties.json endpoints
 # Update the sensor power settings from the properties JSON file
-@app.route("/update_sensor_settings/<sensor>")
+@app.route("/update_sensor_settings/<sensor>", methods=["POST"])
 def update_sensor_settings(sensor):
+    # global in the loaded JSON properties file
     global properties
 
     # const list with all compatible sensors
-    sensors = ["accel", "ambient", "gesture", "proximity"]
+    sensors = ["accelerometer", "ambient", "gesture", "proximity"]
+
+    sensor = sensor.lower()
 
     # if the provided sensor is not in the sensors
     if sensor not in sensors:
@@ -144,12 +148,50 @@ def update_sensor_settings(sensor):
     with open("properties.json", "w") as file:
         json.dump(properties, file, indent=4)
 
+    # Return the new state of the sensor power
+    # True = enabled
+    # False = disabled
     return jsonify(properties[sensor_prop])
 
+# Retrieves all current settings in the properties.json
+@app.route("/get_settings", methods=["GET"])
+def get_settings():
+    return jsonify(properties)
 
 
+# Update the current user through the web application
+@app.route("/set_user/<username>")
+def set_user(username):
+    global properties
 
+    # If the user doesnt exist in the DB, prompt an errors
+    if check_username(username) is False:
+        return jsonify({"message": "user doesnt exist!"}), 403
 
+    # Attempt to query the DB
+    try:
+        # Grab the specified user and set the defaultUser field to the username
+        user = Users.query.filter_by(username=username).first()
+        properties["defaultUser"] = user.username
+
+        # Write to the JSON file
+        with open("properties.json", "w") as file:
+            json.dump(properties, file, indent=4)
+
+        # Return a status message
+        return jsonify({"message": "username updated in config"}), 200
+
+    # If an error occurs, prompt an error message
+    except SQLException.DatabaseError as ex:
+        return jsonify({"message": "user could not be updated in config file!"}), 403
+
+# Helper function to check if a username is available
+def check_username(username):
+    try:
+        user = Users.query.filter_by(username=username).first()
+        return user is not None
+    except SQLException.DatabaseError as ex:
+        return jsonify({"message": "user could not be searched!"}), 403
 
 
 # Websockets
@@ -164,6 +206,10 @@ def handle_disconnect():
 
 
 if __name__ == '__main__':
+    json_file = open("properties.json", "r")
+    json_data = json_file.read()
+    properties = json.loads(json_data)
+    print(str(properties))
     # Create the DB model
     with app.app_context():
         db.create_all()
