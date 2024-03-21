@@ -4,13 +4,13 @@ import Card from '../components/Card';
 import SettingsContext from '../contexts/SettingsContext';
 
 export default function ClientSettings() {
-  const { settings, loading } = useContext(SettingsContext);
+  const { settings, setSettings, loading } = useContext(SettingsContext);
 
   return (
     <>
       <Header title="Settings" />
-      <div className="flex flex-col flex-grow p-3 gap-3 drop-shadow-lg">
-        <p className="font-bold text-2xl">Sensors</p>
+      <div className="flex flex-col flex-grow p-3 gap-3">
+        <h2 className="font-bold text-2xl">Sensors</h2>
         <div className="flex flex-col gap-3">
           {!loading ? (
             <>

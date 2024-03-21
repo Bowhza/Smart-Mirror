@@ -24,7 +24,7 @@ export default function Card({ name, setting, initial }) {
 
   return (
     <div
-      className={`${settingState ? trueState : falseState} h-24 w-full rounded-lg cursor-pointer`}
+      className={`${settingState ? trueState : falseState} h-24 w-full rounded-lg cursor-pointer drop-shadow-lg`}
       onClick={() => {
         if (!updating) {
           updateSetting();

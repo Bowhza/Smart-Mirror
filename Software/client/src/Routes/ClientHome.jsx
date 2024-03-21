@@ -1,20 +1,18 @@
 import Header from '../components/Header';
 
-export default function ClientHome() {
+export default function ClientHome({ isConnected }) {
   return (
     <>
       <Header title="Home" />
       <div className="flex-col flex-grow p-3">
-        <p className="font-bold text-xl">Home Testing</p>
-        <div>
-          <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. In et felis nunc. Aenean posuere lobortis lectus,
-            in interdum ipsum posuere vel. Proin laoreet ipsum velit, ac laoreet diam sagittis a. Curabitur mi quam,
-            laoreet vel mi eu, sodales ornare enim. Suspendisse sit amet porttitor metus. Aliquam scelerisque libero in
-            justo imperdiet, vel efficitur nulla consequat. Aenean congue lacinia dolor et placerat. Nam porta est a
-            justo ultricies cursus.
-          </p>
-        </div>
+        <h2 className="text-xl">
+          Socket Status:{' '}
+          {isConnected ? (
+            <span className="text-green-500 font-bold">Connected</span>
+          ) : (
+            <span className="text-red-500 font-bold">Disconnected</span>
+          )}
+        </h2>
       </div>
     </>
   );
