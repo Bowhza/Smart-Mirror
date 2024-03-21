@@ -1,10 +1,12 @@
 # Imports for required libraries and modules
 from flask import request, jsonify
 from config import socketio, db, app, SQLException, json
+from flask_socketio import emit
 from models import Users, Reminders, datetime, timedelta
 import os
-
 global properties
+
+
 # Main Route
 @app.route('/')
 def main():
@@ -142,23 +144,48 @@ def update_sensor_settings(sensor):
     if sensor not in sensors:
         return jsonify({"message": "sensor doesnt exist"}), 403
 
-    # flip the state of the sensor power mode
-    properties[sensor] = not properties[sensor]
+    try:
+        # flip the state of the sensor power mode
+        properties[sensor] = not properties[sensor]
 
-    # write the new contents to the JSON file
-    with open("properties.json", "w") as file:
-        json.dump(properties, file, indent=2)
+        # write the new contents to the JSON file
+        with open("properties.json", "w") as file:
+            json.dump(properties, file, indent=2)
 
-    # Return the new state of the sensor power
-    # True = enabled
-    # False = disabled
-    return jsonify(properties[sensor])
+        # Return the new state of the sensor power
+        # True = enabled
+        # False = disabled
+        return jsonify(properties[sensor])
+
+    except Exception as ex:
+        return jsonify({"message": "properties file cannot be read!"})
 
 
 # Retrieves all current settings in the properties.json
 @app.route("/get_settings", methods=["GET"])
 def get_settings():
     return jsonify(properties)
+
+
+@app.route("/update_location/<location>")
+def update_location(location):
+    global properties
+    location = location.capitalize()
+
+    try:
+        properties["defaultLocation"] = location
+
+        # write the new contents to the JSON file
+        with open("properties.json", "w") as file:
+            json.dump(properties, file, indent=2)
+
+        # Return the new state of the sensor power
+        # True = enabled
+        # False = disabled
+        return jsonify(properties["defaultLocation"])
+
+    except Exception as ex:
+        return jsonify({"message": "location cannot be updated!"})
 
 
 # Update the current user through the web application
@@ -199,15 +226,24 @@ def handle_disconnect():
     print('Client disconnected')
 
 
-if __name__ == '__main__':
-    current_directory = os.path.dirname(os.path.abspath(__file__))
-    # Construct the relative path to properties.json
-    file_path = os.path.join(current_directory, "properties.json")
+@socketio.on('update')
+def handle_update(message):
+    print(f'Received Message: {message}')
+    emit('update', f'Updated')
 
-    json_file = open(file_path, "r")
-    json_data = json_file.read()
-    properties = json.loads(json_data)
-    print(str(properties))
+
+if __name__ == '__main__':
+    try:
+        current_directory = os.path.dirname(os.path.abspath(__file__))
+        # Construct the relative path to properties.json
+        file_path = os.path.join(current_directory, "properties.json")
+        json_file = open(file_path, "r")
+        json_data = json_file.read()
+        properties = json.loads(json_data)
+        print(str(properties))
+
+    except Exception as ex:
+        print("Cannot load JSON file!")
     # Create the DB model
     with app.app_context():
         db.create_all()
