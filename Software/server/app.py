@@ -2,6 +2,7 @@
 from flask import request, jsonify
 from config import socketio, db, app, SQLException, json
 from models import Users, Reminders, datetime, timedelta
+import os
 
 global properties
 # Main Route
@@ -21,6 +22,20 @@ def add_user(username):
         return jsonify({"message": "user added"}), 200
     except SQLException.DatabaseError:
         return "user not added", 400
+    
+
+# Deletes the user from the DB
+@app.route("/delete_user/<user_id>")
+def delete_user(user_id):
+    if check_user_exists(user_id) is False:
+        return jsonify({"message": "user doesnt exist"}), 403
+    delete_user_reminders(user_id)
+    try:
+        user = Users.query.filter_by(user_id=user_id).first()
+        db.session.delete(user)
+        db.session.commit()
+    except SQLException.DatabaseError as ex:
+        return jsonify({"message": "user could not be deleted!"}), 403
 
 
 # Get all current users in the DB
@@ -32,6 +47,15 @@ def get_users():
         return jsonify({"message": "no users found!"}), 404
 
     return jsonify(json_users), 200
+
+
+# Helper function to check if a username is available
+def check_username(username):
+    try:
+        user = Users.query.filter_by(username=username).first()
+        return user is not None
+    except SQLException.DatabaseError as ex:
+        return jsonify({"message": "user could not be searched!"}), 403
 
 
 # Add reminder to DB
@@ -102,20 +126,6 @@ def get_ip():
     return jsonify({"ip": request.remote_addr})
 
 
-# Deletes the user from the DB
-@app.route("/delete_user/<user_id>")
-def delete_user(user_id):
-    if check_user_exists(user_id) is False:
-        return jsonify({"message": "user doesnt exist"}), 403
-    delete_user_reminders(user_id)
-    try:
-        user = Users.query.filter_by(user_id=user_id).first()
-        db.session.delete(user)
-        db.session.commit()
-    except SQLException.DatabaseError as ex:
-        return jsonify({"message": "user could not be deleted!"}), 403
-
-
 # properties.json endpoints
 # Update the sensor power settings from the properties JSON file
 @app.route("/update_sensor_settings/<sensor>", methods=["POST"])
@@ -132,26 +142,18 @@ def update_sensor_settings(sensor):
     if sensor not in sensors:
         return jsonify({"message": "sensor doesnt exist"}), 403
 
-    # append the power property name to the end of the provided sensor
-    if sensor != "ambient":
-        sensor_prop = sensor + "Power"
-
-    # append brightness adj to ambient light, as the ambient light sensor
-    # only adjusts the brightness of the display
-    else:
-        sensor_prop = sensor + "BrightnessAdj"
-
     # flip the state of the sensor power mode
-    properties[sensor_prop] = not properties[sensor_prop]
+    properties[sensor] = not properties[sensor]
 
     # write the new contents to the JSON file
     with open("properties.json", "w") as file:
-        json.dump(properties, file, indent=4)
+        json.dump(properties, file, indent=2)
 
     # Return the new state of the sensor power
     # True = enabled
     # False = disabled
-    return jsonify(properties[sensor_prop])
+    return jsonify(properties[sensor])
+
 
 # Retrieves all current settings in the properties.json
 @app.route("/get_settings", methods=["GET"])
@@ -176,7 +178,7 @@ def set_user(username):
 
         # Write to the JSON file
         with open("properties.json", "w") as file:
-            json.dump(properties, file, indent=4)
+            json.dump(properties, file, indent=2)
 
         # Return a status message
         return jsonify({"message": "username updated in config"}), 200
@@ -184,14 +186,6 @@ def set_user(username):
     # If an error occurs, prompt an error message
     except SQLException.DatabaseError as ex:
         return jsonify({"message": "user could not be updated in config file!"}), 403
-
-# Helper function to check if a username is available
-def check_username(username):
-    try:
-        user = Users.query.filter_by(username=username).first()
-        return user is not None
-    except SQLException.DatabaseError as ex:
-        return jsonify({"message": "user could not be searched!"}), 403
 
 
 # Websockets
@@ -206,7 +200,11 @@ def handle_disconnect():
 
 
 if __name__ == '__main__':
-    json_file = open("properties.json", "r")
+    current_directory = os.path.dirname(os.path.abspath(__file__))
+    # Construct the relative path to properties.json
+    file_path = os.path.join(current_directory, "properties.json")
+
+    json_file = open(file_path, "r")
     json_data = json_file.read()
     properties = json.loads(json_data)
     print(str(properties))

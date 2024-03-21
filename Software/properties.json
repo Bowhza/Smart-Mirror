@@ -2,7 +2,7 @@
   "accelerometer": false,
   "gesture": false,
   "proximity": false,
-  "ambient": true,
+  "ambient": false,
   "defaultLocation": "Edmonton",
   "defaultUser": "admin"
 }
