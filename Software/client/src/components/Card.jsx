@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
+import SettingsContext from '../contexts/SettingsContext';
 
 export default function Card({ name, setting, initial }) {
   const falseState = 'bg-gradient-to-br from-rose-400 to-red-500';
@@ -7,14 +8,15 @@ export default function Card({ name, setting, initial }) {
 
   const [updating, setUpdating] = useState(false);
   const [settingState, setSettingState] = useState(initial);
+  const { settings, setSettings } = useContext(SettingsContext);
 
   const updateSetting = () => {
     setUpdating(true);
     fetch(`http://${hostIP}:5174/update_sensor_settings/${setting}`, { method: 'POST' })
       .then(res => res.json())
       .then(data => {
-        console.log(data);
         setSettingState(data);
+        setSettings({ ...settings, [setting]: data });
       })
       .catch(error => console.error('Error updating setting:', error))
       .finally(() => setUpdating(false));

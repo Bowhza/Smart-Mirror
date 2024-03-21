@@ -1,20 +1,10 @@
-import { useState, useEffect } from 'react';
-
+import { useState, useEffect, useContext } from 'react';
 import Header from '../components/Header';
 import Card from '../components/Card';
+import SettingsContext from '../contexts/SettingsContext';
 
 export default function ClientSettings() {
-  const hostIP = import.meta.env.VITE_HOST;
-  const [settings, setSettings] = useState(null);
-
-  useEffect(() => {
-    fetch(`http://${hostIP}:5174/get_settings`)
-      .then(res => res.json())
-      .then(data => {
-        console.log(data);
-        setSettings(data);
-      });
-  }, []);
+  const { settings, loading } = useContext(SettingsContext);
 
   return (
     <>
@@ -22,12 +12,12 @@ export default function ClientSettings() {
       <div className="flex flex-col flex-grow p-3 gap-3 drop-shadow-lg">
         <p className="font-bold text-2xl">Sensors</p>
         <div className="flex flex-col gap-3">
-          {settings ? (
+          {!loading ? (
             <>
-              <Card name="Accelerometer" setting="accelerometer" initial={Boolean(settings.accelerometerPower)} />
-              <Card name="Ambient Light" setting="ambient" initial={Boolean(settings.ambientBrightnessAdj)} />
-              <Card name="Gesture Sensor" setting="gesture" initial={Boolean(settings.gesturePower)} />
-              <Card name="Proximity Sensor" setting="proximity" initial={Boolean(settings.proximityPower)} />
+              <Card name="Accelerometer" setting="accelerometer" initial={Boolean(settings.accelerometer)} />
+              <Card name="Ambient Light" setting="ambient" initial={Boolean(settings.ambient)} />
+              <Card name="Gesture Sensor" setting="gesture" initial={Boolean(settings.gesture)} />
+              <Card name="Proximity Sensor" setting="proximity" initial={Boolean(settings.proximity)} />
             </>
           ) : (
             <h2>Fetching Settings...</h2>

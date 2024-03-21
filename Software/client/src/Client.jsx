@@ -49,7 +49,7 @@ const options = [
 
 function NavBar() {
   return (
-    <nav className="grid grid-cols-4 fixed bottom-0 left-0 right-0 font-bold border-t-2">
+    <nav className="grid grid-cols-4 fixed bottom-0 left-0 right-0 font-bold border-t-2 z-10">
       {options.map((item, index) => {
         return <NavItem key={index} info={item} />;
       })}
