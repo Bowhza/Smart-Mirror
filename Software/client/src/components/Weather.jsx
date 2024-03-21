@@ -1,11 +1,14 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useContext } from 'react';
 import conditions from '../conditions.json';
 import './Animations.css';
+import SettingsContext from '../contexts/SettingsContext';
 
 export default function Weather() {
   const APIKey = import.meta.env.VITE_API_KEY;
+  const { settings } = useContext(SettingsContext);
+
   const [weather, setWeather] = useState({});
-  const [location, setLocation] = useState('Edmonton');
+  const [location, setLocation] = useState(settings.defaultLocation);
   const [Svg, setSvg] = useState(null);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [showForecast, setShowForecast] = useState(false);

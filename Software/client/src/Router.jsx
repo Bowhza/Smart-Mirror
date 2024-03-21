@@ -20,7 +20,7 @@ const Router = () => {
   const router = createBrowserRouter([
     {
       path: '*',
-      element: ip === hostIP ? <Client /> : <Client />,
+      element: ip === hostIP ? <App /> : <Client />,
     },
   ]);
   return <RouterProvider router={router} />;
