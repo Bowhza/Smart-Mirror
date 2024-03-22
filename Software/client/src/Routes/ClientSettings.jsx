@@ -4,7 +4,7 @@ import Input from '../components/Input';
 import SettingCard from '../components/SettingCard';
 import SettingsContext from '../contexts/SettingsContext';
 
-export default function ClientSettings() {
+export default function ClientSettings({ socket }) {
   const { settings, setSettings, loading } = useContext(SettingsContext);
   const hostIP = import.meta.env.VITE_HOST;
 
@@ -15,6 +15,7 @@ export default function ClientSettings() {
         .then(data => {
           console.log(data);
           setSettings({ ...settings, defaultLocation: value });
+          socket.emit('update', 'Settings Updated');
         })
         .catch(error => console.error(error));
     }
@@ -23,7 +24,7 @@ export default function ClientSettings() {
   return (
     <>
       <Header title="Settings" />
-      <div className="flex flex-col flex-grow p-3 gap-3">
+      <div className="flex flex-col flex-grow p-3 gap-3 pb-24">
         <div className="flex flex-col gap-3">
           {!loading ? (
             <>

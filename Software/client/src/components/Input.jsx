@@ -15,7 +15,7 @@ export default function Input({ label, placeholder, data, method }) {
             setValue(e.target.value);
           }}
           placeholder={placeholder}
-          className="border-2 rounded-md h-10 shadow-sm focus:border-purple-500 outline-none"
+          className="border-2 rounded-md h-10 shadow-sm focus:border-neutral-400 outline-none px-2"
           type="text"
           value={value}
         />

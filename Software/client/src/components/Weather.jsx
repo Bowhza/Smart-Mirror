@@ -1,11 +1,9 @@
 import React, { useEffect, useState, useMemo, useContext } from 'react';
 import conditions from '../conditions.json';
 import './Animations.css';
-import SettingsContext from '../contexts/SettingsContext';
 
-export default function Weather() {
+export default function Weather({ settings }) {
   const APIKey = import.meta.env.VITE_API_KEY;
-  const { settings } = useContext(SettingsContext);
 
   const [weather, setWeather] = useState({});
   const [location, setLocation] = useState(settings.defaultLocation);
@@ -123,7 +121,7 @@ function ForecastCard({ info }) {
   return (
     <div className="flex flex-col items-center pt-2 pb-2 rounded-md bg-zinc-800 w-28 border-2 border-neutral-700">
       <h2 className="font-bold text-sm">{days[new Date(date).getUTCDay()]}</h2>
-      <h3 className="text-xs">{day.condition.text}</h3>
+      <h3 className="text-xs text-center">{day.condition.text}</h3>
       <img src={`/svgs/${svgName.day}`} className="w-16" alt={day.condition.text} />
       <div className="flex justify-between">
         <img src="../svgs/thermometer-warmer.svg" alt="Thermometer warmer" className="w-6 h-6 self-start" />{' '}

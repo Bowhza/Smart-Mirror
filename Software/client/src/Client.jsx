@@ -8,39 +8,18 @@ import ClientHome from './Routes/ClientHome';
 import ClientReminders from './Routes/ClientReminders';
 import ClientUsers from './Routes/ClientUsers';
 import ClientSettings from './Routes/ClientSettings';
-import { useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
 
 const socket = io(`http://${import.meta.env.VITE_HOST}:5174`);
 
 export default function Client() {
-  const [isConnected, setIsConnected] = useState(socket.connected);
-
-  useEffect(() => {
-    function onConnect() {
-      setIsConnected(true);
-    }
-
-    function onDisconnect() {
-      setIsConnected(false);
-    }
-
-    socket.on('connect', onConnect);
-    socket.on('disconnect', onDisconnect);
-
-    return () => {
-      socket.off('connect', onConnect);
-      socket.off('disconnect', onDisconnect);
-    };
-  }, []);
-
   return (
     <div className="flex flex-col h-svh">
       <Routes>
-        <Route path="/" element={<ClientHome isConnected={isConnected} />} />
+        <Route path="/" element={<ClientHome socket={socket} />} />
         <Route path="/reminders" Component={ClientReminders} />
         <Route path="/users" Component={ClientUsers} />
-        <Route path="/settings" Component={ClientSettings} />
+        <Route path="/settings" element={<ClientSettings socket={socket} />} />
       </Routes>
       <NavBar />
     </div>

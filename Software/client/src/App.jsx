@@ -1,23 +1,32 @@
 import Weather from './components/Weather';
 import Reminders from './components/Reminders';
 import News from './components/News';
-import { useContext } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import SettingsContext from './contexts/SettingsContext';
+import { io } from 'socket.io-client';
+
+const socket = io(`http://${import.meta.env.VITE_HOST}:5174`);
 
 export default function App() {
-  const { settings, loading } = useContext(SettingsContext);
+  const { fetchSettings, settings, loading } = useContext(SettingsContext);
+
+  useEffect(() => {
+    socket.on('update', msg => {
+      fetchSettings();
+    });
+
+    return () => {
+      socket.off('update');
+    };
+  }, []);
 
   return (
     <>
       <div className="flex flex-col h-screen overflow-hidden bg-neutral-900">
-        <div className="grid md:grid-cols-7 text-neutral-50 flex-1">
-          {!loading ? (
-            <>
-              <Weather />
-              <Reminders />
-              <News />
-            </>
-          ) : null}
+        <div className="grid md:grid-cols-7 text-neutral-50 flex-grow">
+          {!loading ? <Weather settings={settings} /> : null}
+          <Reminders />
+          <News />
         </div>
       </div>
     </>
