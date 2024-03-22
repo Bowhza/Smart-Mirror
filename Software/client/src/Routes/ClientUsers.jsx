@@ -1,19 +1,36 @@
 import Header from '../components/Header';
+import Input from '../components/Input';
+import { useState } from 'react';
 
 export default function ClientUsers() {
+  const hostIP = import.meta.env.VITE_HOST;
+  const [response, setResponse] = useState({});
+
+  const AddUser = Username => {
+    if (Username.trim().length > 0) {
+      fetch(`http://${hostIP}:5174/add_user/${Username}`, { method: 'POST' })
+        .then(res => {
+          setResponse({ status: res.status == 200 });
+          console.log(res.status);
+          return res.json();
+        })
+        .then(data => {
+          console.log(data);
+          setResponse({ ...response, message: data.message });
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          setResponse({ ...response, message: error.message });
+        });
+    }
+  };
+
   return (
     <>
       <Header title="Users" />
       <div className="flex-col flex-grow p-3">
-        <p className="font-bold text-xl">Users Testing</p>
         <div>
-          <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. In et felis nunc. Aenean posuere lobortis lectus,
-            in interdum ipsum posuere vel. Proin laoreet ipsum velit, ac laoreet diam sagittis a. Curabitur mi quam,
-            laoreet vel mi eu, sodales ornare enim. Suspendisse sit amet porttitor metus. Aliquam scelerisque libero in
-            justo imperdiet, vel efficitur nulla consequat. Aenean congue lacinia dolor et placerat. Nam porta est a
-            justo ultricies cursus.
-          </p>
+          <Input label="Add User" placeholder="ex. Admin" data="" buttonLabel="Submit" method={AddUser} />
         </div>
       </div>
     </>

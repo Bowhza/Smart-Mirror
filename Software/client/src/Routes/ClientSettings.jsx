@@ -33,6 +33,7 @@ export default function ClientSettings({ socket }) {
                 label="Weather Location"
                 data={settings.defaultLocation}
                 placeholder="Country, Region or City"
+                buttonLabel="Set Location"
                 method={updateLocation}
               />
               <h2 className="font-bold text-2xl">Sensors</h2>
