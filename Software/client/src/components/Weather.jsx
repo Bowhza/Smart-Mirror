@@ -21,6 +21,7 @@ export default function Weather({ settings }) {
         },
       );
       const data = await response.json();
+      console.log(data);
       setWeather(data);
 
       const conditionObj = conditions.find(item => item.code == data.current.condition.code);
@@ -89,7 +90,7 @@ function WeatherDisplay({ weather, Svg, currentTime }) {
         </div>
         <div>
           <h2 className="text-3xl" id="current-time">
-            Local Time: {currentTime.toLocaleTimeString()}
+            Local Time: {currentTime.toLocaleTimeString('en-UK', { timeZone: weather.location.tz_id })}
           </h2>
         </div>
       </div>
