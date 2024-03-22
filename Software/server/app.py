@@ -216,25 +216,34 @@ def set_user(username):
 
 
 # Websockets
+
+# Set to store the connected clients
+connected_clients = set()
+
 @socketio.on('connect')
 def handle_connect():
+    connected_clients.add(request.sid)
+    print(f'Connected Clients: {len(connected_clients)}')
     print('Client connected')
 
 
 @socketio.on('disconnect')
 def handle_disconnect():
+    connected_clients.remove(request.sid)
+    print(f'Connected Clients: {len(connected_clients)}')
     print('Client disconnected')
 
 
 @socketio.on('update')
 def handle_update(message):
     print(f'Received Message: {message}')
-    emit('update', f'Updated')
+    emit('update', f'Updated', broadcast=True)
 
 
 if __name__ == '__main__':
     try:
         current_directory = os.path.dirname(os.path.abspath(__file__))
+        print(current_directory)
         # Construct the relative path to properties.json
         file_path = os.path.join(current_directory, "properties.json")
         json_file = open(file_path, "r")
