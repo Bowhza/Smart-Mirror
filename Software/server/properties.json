@@ -1,8 +1,8 @@
 {
   "accelerometer": true,
-  "gesture": true,
-  "proximity": false,
+  "gesture": false,
+  "proximity": true,
   "ambient": false,
-  "defaultLocation": "Edmonton",
+  "defaultLocation": "Bali",
   "defaultUser": "admin"
 }

@@ -15,15 +15,23 @@ def main():
 
 # Database interaction endpoints
 # Add user to DB
-@app.route("/add_user", methods=["POST"])
+@app.route("/add_user/<username>", methods=["POST"])
 def add_user(username):
+    username = username.replace(" ", "")
+    if not username.isalnum:
+        return jsonify({"message": "Invalid Format! Usernames must be alphanumeric"})
+
+    username = username.strip()
+    if check_username(username) is True:
+        return jsonify({"message": "Username Taken!"}), 406
+
     try:
         new_user = Users(username)
         db.session.add(new_user)
         db.session.commit()
-        return jsonify({"message": "user added"}), 200
+        return jsonify({"message": "User Added"}), 200
     except SQLException.DatabaseError:
-        return "user not added", 400
+        return jsonify({"message": "User Not Added"}), 400
     
 
 # Deletes the user from the DB
@@ -31,13 +39,28 @@ def add_user(username):
 def delete_user(user_id):
     if check_user_exists(user_id) is False:
         return jsonify({"message": "user doesnt exist"}), 403
-    delete_user_reminders(user_id)
+
+    if len(Reminders.query.filter_by(userID=user_id).all()) > 0:
+        delete_user_reminders(user_id)
     try:
-        user = Users.query.filter_by(user_id=user_id).first()
+        user = Users.query.filter_by(userID=user_id).first()
         db.session.delete(user)
         db.session.commit()
     except SQLException.DatabaseError as ex:
         return jsonify({"message": "user could not be deleted!"}), 403
+
+@app.route("/clear_db")
+def clear_db():
+    try:
+        users = Users.query.all()
+        for user in users:
+            user_id = user.userID
+            delete_user(user_id)
+    except SQLException.DatabaseError as ex:
+        return jsonify({"message": "users could not be deleted!"}), 403
+
+    return jsonify({"message": "Database cleared!"})
+
 
 
 # Get all current users in the DB
@@ -54,8 +77,9 @@ def get_users():
 # Helper function to check if a username is available
 def check_username(username):
     try:
-        user = Users.query.filter_by(username=username).first()
-        return user is not None
+        users = Users.query.all()
+        lowercase_users = [user.username.lower() for user in users]
+        return username.lower() in lowercase_users
     except SQLException.DatabaseError as ex:
         return jsonify({"message": "user could not be searched!"}), 403
 
