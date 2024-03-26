@@ -22,7 +22,7 @@ export default function Input({ label, placeholder, data, buttonLabel, method })
       </div>
       <div>
         <button
-          className={`px-5 py-2 rounded-md text-neutral-100 font-bold ${value.length > 0 ? isValid : isInvalid}`}
+          className={`px-5 py-2 rounded-md text-neutral-100 font-bold shadow-md ${value.length > 0 ? isValid : isInvalid}`}
           onClick={() => method(value)}
         >
           {buttonLabel}
