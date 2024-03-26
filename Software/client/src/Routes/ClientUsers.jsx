@@ -60,7 +60,7 @@ export default function ClientUsers() {
   return (
     <>
       <Header title="Users" />
-      <div className="flex-col flex-grow p-3">
+      <div className="flex-col flex-grow p-3 pb-24">
         {showBanner && (
           <Notification
             message={response.message}
