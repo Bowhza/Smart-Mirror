@@ -35,6 +35,7 @@ export default function ClientSettings({ socket }) {
                 placeholder="Country, Region or City"
                 buttonLabel="Set Location"
                 method={updateLocation}
+                clear={false}
               />
               <h2 className="font-bold text-2xl">Sensors</h2>
               <SettingCard name="Accelerometer" setting="accelerometer" initial={Boolean(settings.accelerometer)} />

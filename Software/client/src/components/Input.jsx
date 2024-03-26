@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-export default function Input({ label, placeholder, data, buttonLabel, method }) {
+export default function Input({ label, placeholder, data, buttonLabel, method, clear }) {
   const [value, setValue] = useState(data);
 
   const isInvalid = 'bg-gradient-to-br from-rose-400 to-red-500';
@@ -15,7 +15,7 @@ export default function Input({ label, placeholder, data, buttonLabel, method })
             setValue(e.target.value);
           }}
           placeholder={placeholder}
-          className="border-2 rounded-md h-10 shadow-sm focus:border-neutral-400 outline-none px-2"
+          className="border-2 rounded-md h-10 shadow-sm focus:border-neutral-400 outline-none px-2 bg-neutral-100"
           type="text"
           value={value}
         />
@@ -23,7 +23,10 @@ export default function Input({ label, placeholder, data, buttonLabel, method })
       <div>
         <button
           className={`px-5 py-2 rounded-md text-neutral-100 font-bold shadow-md ${value.length > 0 ? isValid : isInvalid}`}
-          onClick={() => method(value)}
+          onClick={() => {
+            method(value);
+            if (clear) setValue('');
+          }}
         >
           {buttonLabel}
         </button>

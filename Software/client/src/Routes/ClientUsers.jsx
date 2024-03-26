@@ -18,7 +18,6 @@ export default function ClientUsers() {
     fetch(`http://${hostIP}:5174/get_users`, { mode: 'cors', method: 'GET' })
       .then(res => res.json())
       .then(data => {
-        console.log(data);
         setUsers(data);
       });
   };
@@ -70,30 +69,38 @@ export default function ClientUsers() {
             color={response.color}
           />
         )}
-        <Input label="Add User" placeholder="ex. Admin" data="" buttonLabel="Submit" method={AddUser} />
+        <Input label="Add User" placeholder="ex. Admin" data="" buttonLabel="Submit" method={AddUser} clear={true} />
 
-        <div className="grid grid-flow-row row-auto gap-3 mt-3">
-          {users.length > 0 &&
-            users.map((item, index) => {
-              console.log(item);
-              return (
-                <div key={item.userID} className="flex justify-between items-center">
-                  <h3 className="font-bold">{item.userName}</h3>
-                  <div className="flex gap-3">
-                    <Button
-                      text="Select"
-                      color="bg-gradient-to-br from-emerald-400 to-emerald-600"
-                      onClick={() => setUser(item.userID)}
-                    />
-                    <Button
-                      text="Delete"
-                      color="bg-gradient-to-br from-rose-400 to-red-500"
-                      onClick={() => deleteUser(item.userID)}
-                    />
+        <div className="grid grid-flow-row row-auto mt-3">
+          <h2 className="font-bold ">Existing Users</h2>
+          <div className="flex flex-col gap-3">
+            {users.length > 0 ? (
+              users.map((item, index) => {
+                return (
+                  <div
+                    key={item.userID}
+                    className="flex justify-between items-center border-2 p-2 rounded-md shadow-sm bg-neutral-100"
+                  >
+                    <h3 className="font-bold text-lg">{item.userName}</h3>
+                    <div className="flex gap-3">
+                      <Button
+                        text="Select"
+                        color="bg-gradient-to-br from-emerald-400 to-emerald-600"
+                        onClick={() => setUser(item.userID)}
+                      />
+                      <Button
+                        text="Delete"
+                        color="bg-gradient-to-br from-rose-400 to-red-500"
+                        onClick={() => deleteUser(item.userID)}
+                      />
+                    </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })
+            ) : (
+              <h2 className="font-bold text-3xl text-center m-3 text-neutral-300">No users found</h2>
+            )}
+          </div>
         </div>
       </div>
     </>
