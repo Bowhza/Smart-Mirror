@@ -3,6 +3,6 @@
   "gesture": false,
   "proximity": true,
   "ambient": false,
-  "defaultLocation": "Bali",
-  "defaultUser": "admin"
+  "defaultLocation": "Edmonton",
+  "defaultUser": ""
 }
