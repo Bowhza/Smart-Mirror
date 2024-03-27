@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-export default function Input({ label, placeholder, data, buttonLabel, method, clear }) {
+export default function ButtonedInput({ label, placeholder, data, buttonLabel, method, clear }) {
   const [value, setValue] = useState(data);
 
   const isInvalid = 'bg-gradient-to-br from-rose-400 to-red-500';

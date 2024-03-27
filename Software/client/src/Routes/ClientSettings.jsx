@@ -1,6 +1,6 @@
-import { useState, useEffect, useContext } from 'react';
+import { useContext } from 'react';
 import Header from '../components/Header';
-import Input from '../components/Input';
+import ButtonedInput from '../components/ButtonedInput';
 import SettingCard from '../components/SettingCard';
 import SettingsContext from '../contexts/SettingsContext';
 
@@ -29,7 +29,7 @@ export default function ClientSettings({ socket }) {
           {!loading ? (
             <>
               <h2 className="font-bold text-2xl">Location</h2>
-              <Input
+              <ButtonedInput
                 label="Weather Location"
                 data={settings.defaultLocation}
                 placeholder="Country, Region or City"

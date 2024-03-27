@@ -1,11 +1,13 @@
 import Header from '../components/Header';
-import Input from '../components/Input';
+import ButtonedInput from '../components/ButtonedInput';
 import Notification from '../components/Notification';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import Button from '../components/Button';
+import SettingsContext from '../contexts/SettingsContext';
 
-export default function ClientUsers({ users, fetchUsers }) {
+export default function ClientUsers({ data, fetchUsers }) {
   const hostIP = import.meta.env.VITE_HOST;
+  const { settings } = useContext(SettingsContext);
   const [response, setResponse] = useState({});
   const [showBanner, setShowBanner] = useState(false);
 
@@ -56,19 +58,30 @@ export default function ClientUsers({ users, fetchUsers }) {
             color={response.color}
           />
         )}
-        <Input label="Add User" placeholder="ex. Admin" data="" buttonLabel="Submit" method={AddUser} clear={true} />
+        <ButtonedInput
+          label="Add User"
+          placeholder="ex. Admin"
+          data=""
+          buttonLabel="Submit"
+          method={AddUser}
+          clear={true}
+        />
 
         <div className="grid grid-flow-row row-auto mt-3">
           <h2 className="font-bold ">Existing Users</h2>
           <div className="flex flex-col gap-3">
-            {users.length > 0 ? (
-              users.map((item, index) => {
+            {data.users && data.users.length > 0 ? (
+              data.users.map((item, index) => {
                 return (
                   <div
                     key={item.userID}
-                    className="flex justify-between items-center border-2 p-2 rounded-md shadow-sm bg-neutral-100"
+                    className="flex justify-between items-center border-2 p-2 rounded-md drop-shadow-sm bg-neutral-100"
                   >
-                    <h3 className="font-bold text-lg">{item.userName}</h3>
+                    <h3
+                      className={`font-bold text-lg drop-shadow-lg ${settings.defaultUser === item.userName && 'text-green-600'}`}
+                    >
+                      {item.userName}
+                    </h3>
                     <div className="flex gap-3">
                       <Button
                         text="Select"

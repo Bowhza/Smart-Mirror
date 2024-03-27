@@ -4,18 +4,21 @@ import { IoMdSettings } from 'react-icons/io';
 import { FaHome } from 'react-icons/fa';
 
 import { NavLink, Route, Routes } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import ClientHome from './Routes/ClientHome';
 import ClientReminders from './Routes/ClientReminders';
 import ClientUsers from './Routes/ClientUsers';
 import ClientSettings from './Routes/ClientSettings';
 import { io } from 'socket.io-client';
+import SettingsContext from './contexts/SettingsContext';
 
 const socket = io(`http://${import.meta.env.VITE_HOST}:5174`);
 
 export default function Client() {
   const [users, setUsers] = useState([]);
+  const { settings, setSettings } = useContext(SettingsContext);
   const hostIP = import.meta.env.VITE_HOST;
+
   useEffect(() => {
     fetchUsers();
   }, []);
@@ -25,6 +28,7 @@ export default function Client() {
       .then(res => res.json())
       .then(data => {
         setUsers(data);
+        setSettings({ ...settings, defaultUser: data.default });
       });
   };
 
@@ -33,7 +37,7 @@ export default function Client() {
       <Routes>
         <Route path="/" element={<ClientHome socket={socket} />} />
         <Route path="/reminders" Component={ClientReminders} />
-        <Route path="/users" element={<ClientUsers users={users} fetchUsers={fetchUsers} />} />
+        <Route path="/users" element={<ClientUsers data={users} fetchUsers={fetchUsers} />} />
         <Route path="/settings" element={<ClientSettings socket={socket} />} />
       </Routes>
       <NavBar />
