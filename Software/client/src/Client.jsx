@@ -4,6 +4,7 @@ import { IoMdSettings } from 'react-icons/io';
 import { FaHome } from 'react-icons/fa';
 
 import { NavLink, Route, Routes } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import ClientHome from './Routes/ClientHome';
 import ClientReminders from './Routes/ClientReminders';
 import ClientUsers from './Routes/ClientUsers';
@@ -13,12 +14,26 @@ import { io } from 'socket.io-client';
 const socket = io(`http://${import.meta.env.VITE_HOST}:5174`);
 
 export default function Client() {
+  const [users, setUsers] = useState([]);
+  const hostIP = import.meta.env.VITE_HOST;
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const fetchUsers = () => {
+    fetch(`http://${hostIP}:5174/get_users`, { mode: 'cors', method: 'GET' })
+      .then(res => res.json())
+      .then(data => {
+        setUsers(data);
+      });
+  };
+
   return (
     <div className="flex flex-col h-svh">
       <Routes>
         <Route path="/" element={<ClientHome socket={socket} />} />
         <Route path="/reminders" Component={ClientReminders} />
-        <Route path="/users" Component={ClientUsers} />
+        <Route path="/users" element={<ClientUsers users={users} fetchUsers={fetchUsers} />} />
         <Route path="/settings" element={<ClientSettings socket={socket} />} />
       </Routes>
       <NavBar />

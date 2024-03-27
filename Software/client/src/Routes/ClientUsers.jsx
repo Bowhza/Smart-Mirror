@@ -4,28 +4,15 @@ import Notification from '../components/Notification';
 import { useEffect, useState } from 'react';
 import Button from '../components/Button';
 
-export default function ClientUsers() {
+export default function ClientUsers({ users, fetchUsers }) {
   const hostIP = import.meta.env.VITE_HOST;
   const [response, setResponse] = useState({});
   const [showBanner, setShowBanner] = useState(false);
-  const [users, setUsers] = useState([]);
-
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-
-  const fetchUsers = () => {
-    fetch(`http://${hostIP}:5174/get_users`, { mode: 'cors', method: 'GET' })
-      .then(res => res.json())
-      .then(data => {
-        setUsers(data);
-      });
-  };
 
   const handleAPIRequest = (path, method) => {
     return fetch(`http://${hostIP}:5174/${path}`, { method })
       .then(res => {
-        setResponse(prev => ({ ...prev, color: res.status === 200 ? 'green' : 'red' }));
+        setResponse(prev => ({ ...prev, color: res.ok ? 'green' : 'red' }));
         return res.json();
       })
       .then(data => {
