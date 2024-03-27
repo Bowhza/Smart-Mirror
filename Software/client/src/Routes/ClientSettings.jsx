@@ -1,12 +1,18 @@
-import { useContext } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import Header from '../components/Header';
 import ButtonedInput from '../components/ButtonedInput';
 import SettingCard from '../components/SettingCard';
 import SettingsContext from '../contexts/SettingsContext';
+import Toggle from '../components/Toggle';
 
 export default function ClientSettings({ socket }) {
   const { settings, setSettings, loading } = useContext(SettingsContext);
+  const [is24Hour, setIs24Hour] = useState(false);
   const hostIP = import.meta.env.VITE_HOST;
+
+  const handleToggle = () => {
+    setIs24Hour(!is24Hour);
+  };
 
   const updateLocation = value => {
     if (value.length > 0) {
@@ -37,6 +43,16 @@ export default function ClientSettings({ socket }) {
                 method={updateLocation}
                 clear={false}
               />
+
+              <div className="flex flex-col">
+                <h2 className="font-bold mb-4">Time Format</h2>
+                <div className="flex items-center mb-4 justify-center">
+                  <span className="mr-2 font-bold drop-shadow-md">12-Hour Format</span>
+                  <Toggle isOn={is24Hour} handleToggle={handleToggle} />
+                  <span className="ml-2 font-bold drop-shadow-md">24-Hour Format</span>
+                </div>
+              </div>
+
               <h2 className="font-bold text-2xl">Sensors</h2>
               <SettingCard name="Accelerometer" setting="accelerometer" initial={Boolean(settings.accelerometer)} />
               <SettingCard name="Ambient Light" setting="ambient" initial={Boolean(settings.ambient)} />
