@@ -1,8 +1,9 @@
 {
-  "accelerometer": true,
-  "gesture": false,
-  "proximity": true,
-  "ambient": false,
+  "accelerometer": false,
+  "gesture": true,
+  "proximity": false,
+  "ambient": true,
   "defaultLocation": "Edmonton",
-  "defaultUser": ""
+  "defaultUser": "Bohdan",
+  "timeFormat": "en-us"
 }

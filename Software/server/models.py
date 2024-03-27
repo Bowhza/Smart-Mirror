@@ -37,6 +37,6 @@ class Reminders(db.Model):
         return {
             'userID': self.userID,
             'eventTitle': self.event_title,
-            'dateAdded': self.date_added.strftime('%Y-%m-%d'),
-            'endDate': self.end_date.strftime('%Y-%m-%d')
+            'dateAdded': self.date_added.strftime('%Y-%m-%d %H:%M:%S'),
+            'endDate': self.end_date.strftime('%Y-%m-%d %H:%M:%S')
         }

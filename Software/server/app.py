@@ -120,7 +120,7 @@ def get_users():
     json_users = [user.to_json() for user in users]
 
     # Return the users JSON info
-    return jsonify(json_users), 200
+    return jsonify({"users": json_users, "default": properties["defaultUser"]}), 200
 
 
 # @app.route("/clear_nulls")
@@ -182,8 +182,8 @@ def get_reminders(user_id):
     events = Reminders.query.filter_by(userID=user_id).all()
     json_events = [event.to_json() for event in events]
 
-    if len(json_events) == 0:
-        return '<h1>no events found!</h1>', 200
+    # if len(json_events) == 0:
+    #     return jsonify({"message": "No Events Found!"}), 200
 
     return jsonify(json_events), 200
 
@@ -258,6 +258,15 @@ def update_sensor_settings(sensor):
 def get_settings():
     return jsonify(properties), 200
 
+@app.route("/get_default_user_id")
+def get_default_user_id():
+    try:
+        user = Users.query.filter_by(username=properties["defaultUser"])
+        return (user.to_json()).userID, 200
+    except SQLException.DatabaseError as ex:
+        return jsonify({"message": "User ID could not be Retrieved!"}), 400
+
+
 
 @app.route("/update_location/<location>")
 def update_location(location):
@@ -278,6 +287,24 @@ def update_location(location):
 
     except Exception as ex:
         return jsonify({"message": "location cannot be updated!"})
+
+
+@app.route("/update_time_format/<format>", methods=["POST"])
+def update_time_format(format):
+    global properties
+    formats = ["en-uk", "en-us"]
+    if format not in formats:
+        return jsonify({"message": "Invalid format!"}), 400
+
+    try:
+        properties["timeFormat"] = format
+
+        with open("properties.json", "w") as file:
+            json.dump(properties, file, indent=2)
+        return jsonify(properties["timeFormat"]), 200
+
+    except Exception as ex:
+        return jsonify({"message": "Cannot Update Properties File!"}), 400
 
 
 # Update the current user through the web application
