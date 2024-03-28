@@ -1,13 +1,11 @@
 import Header from '../components/Header';
 import ButtonedInput from '../components/ButtonedInput';
 import Notification from '../components/Notification';
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Button from '../components/Button';
-import SettingsContext from '../contexts/SettingsContext';
 
-export default function ClientUsers({ data, fetchUsers }) {
+export default function ClientUsers({ data, fetchUsers, settings }) {
   const hostIP = import.meta.env.VITE_HOST;
-  const { settings } = useContext(SettingsContext);
   const [response, setResponse] = useState({});
   const [showBanner, setShowBanner] = useState(false);
 

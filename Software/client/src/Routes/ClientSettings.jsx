@@ -19,7 +19,6 @@ export default function ClientSettings({ socket }) {
     fetch(`http://${hostIP}:5174/update_time_format/${newIs24Hour ? 'en-uk' : 'en-us'}`, { method: 'POST' })
       .then(res => res.json())
       .then(data => {
-        console.log(data);
         socket.emit('update', 'Settings Updated');
       })
       .catch(error => console.error(error));

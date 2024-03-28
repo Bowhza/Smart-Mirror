@@ -28,7 +28,7 @@ export default function Client() {
       .then(res => res.json())
       .then(data => {
         setUsers(data);
-        setSettings({ ...settings, defaultUser: data.default });
+        setSettings({ ...settings, defaultUser: data.default, defaultUserID: data.id });
       });
   };
 
@@ -38,8 +38,8 @@ export default function Client() {
         <>
           <Routes>
             <Route path="/" element={<ClientHome socket={socket} />} />
-            <Route path="/reminders" Component={ClientReminders} />
-            <Route path="/users" element={<ClientUsers data={users} fetchUsers={fetchUsers} />} />
+            <Route path="/reminders" element={<ClientReminders selectedUserID={settings.defaultUserID} />} />
+            <Route path="/users" element={<ClientUsers data={users} fetchUsers={fetchUsers} settings={settings} />} />
             <Route path="/settings" element={<ClientSettings socket={socket} />} />
           </Routes>
           <NavBar />
