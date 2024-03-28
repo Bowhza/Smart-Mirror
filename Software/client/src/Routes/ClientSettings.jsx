@@ -7,11 +7,22 @@ import Toggle from '../components/Toggle';
 
 export default function ClientSettings({ socket }) {
   const { settings, setSettings, loading } = useContext(SettingsContext);
-  const [is24Hour, setIs24Hour] = useState(false);
+  const [is24Hour, setIs24Hour] = useState(settings.timeFormat === 'en-uk');
   const hostIP = import.meta.env.VITE_HOST;
 
   const handleToggle = () => {
-    setIs24Hour(!is24Hour);
+    const newIs24Hour = !is24Hour;
+
+    setIs24Hour(newIs24Hour);
+
+    // Use the new value directly in the fetch call
+    fetch(`http://${hostIP}:5174/update_time_format/${newIs24Hour ? 'en-uk' : 'en-us'}`, { method: 'POST' })
+      .then(res => res.json())
+      .then(data => {
+        console.log(data);
+        socket.emit('update', 'Settings Updated');
+      })
+      .catch(error => console.error(error));
   };
 
   const updateLocation = value => {
@@ -34,7 +45,7 @@ export default function ClientSettings({ socket }) {
         <div className="flex flex-col gap-3">
           {!loading ? (
             <>
-              <h2 className="font-bold text-2xl">Location</h2>
+              <h2 className="font-bold text-2xl">General</h2>
               <ButtonedInput
                 label="Weather Location"
                 data={settings.defaultLocation}

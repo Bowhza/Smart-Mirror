@@ -58,7 +58,7 @@ export default function Weather({ settings }) {
     <div className="flex-col m-2 md:col-span-2 font-bold p-3">
       {weather.forecast ? (
         <>
-          <WeatherDisplay weather={weather} Svg={Svg} currentTime={currentTime} />
+          <WeatherDisplay weather={weather} Svg={Svg} currentTime={currentTime} settings={settings} />
           {showForecast ? <Forecast data={weather.forecast} /> : <Stats data={weather} />}
         </>
       ) : (
@@ -68,7 +68,7 @@ export default function Weather({ settings }) {
   );
 }
 
-function WeatherDisplay({ weather, Svg, currentTime }) {
+function WeatherDisplay({ weather, Svg, currentTime, settings }) {
   const { location, current } = weather;
   return (
     <>
@@ -90,7 +90,7 @@ function WeatherDisplay({ weather, Svg, currentTime }) {
         </div>
         <div>
           <h2 className="text-3xl" id="current-time">
-            Local Time: {currentTime.toLocaleTimeString('en-UK', { timeZone: weather.location.tz_id })}
+            Local Time: {currentTime.toLocaleTimeString(settings.timeFormat, { timeZone: weather.location.tz_id })}
           </h2>
         </div>
       </div>

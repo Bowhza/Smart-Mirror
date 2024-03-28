@@ -16,7 +16,7 @@ const socket = io(`http://${import.meta.env.VITE_HOST}:5174`);
 
 export default function Client() {
   const [users, setUsers] = useState([]);
-  const { settings, setSettings } = useContext(SettingsContext);
+  const { settings, setSettings, loading } = useContext(SettingsContext);
   const hostIP = import.meta.env.VITE_HOST;
 
   useEffect(() => {
@@ -34,13 +34,17 @@ export default function Client() {
 
   return (
     <div className="flex flex-col h-svh">
-      <Routes>
-        <Route path="/" element={<ClientHome socket={socket} />} />
-        <Route path="/reminders" Component={ClientReminders} />
-        <Route path="/users" element={<ClientUsers data={users} fetchUsers={fetchUsers} />} />
-        <Route path="/settings" element={<ClientSettings socket={socket} />} />
-      </Routes>
-      <NavBar />
+      {!loading && (
+        <>
+          <Routes>
+            <Route path="/" element={<ClientHome socket={socket} />} />
+            <Route path="/reminders" Component={ClientReminders} />
+            <Route path="/users" element={<ClientUsers data={users} fetchUsers={fetchUsers} />} />
+            <Route path="/settings" element={<ClientSettings socket={socket} />} />
+          </Routes>
+          <NavBar />
+        </>
+      )}
     </div>
   );
 }
