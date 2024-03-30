@@ -35,7 +35,7 @@ class Reminders(db.Model):
 
     def to_json(self):
         return {
-            'userID': self.userID,
+            'reminderID': self.reminder_id,
             'eventTitle': self.event_title,
             'dateAdded': self.date_added.strftime('%Y-%m-%d %H:%M:%S'),
             'endDate': self.end_date.strftime('%Y-%m-%d %H:%M:%S')

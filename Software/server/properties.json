@@ -5,5 +5,6 @@
   "ambient": true,
   "defaultLocation": "Edmonton",
   "defaultUser": "Bohdan",
-  "timeFormat": "en-us"
+  "defaultUserID": 1,
+  "timeFormat": "en-uk"
 }
