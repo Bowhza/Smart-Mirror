@@ -11,6 +11,7 @@ import ClientUsers from './Routes/ClientUsers';
 import ClientSettings from './Routes/ClientSettings';
 import { io } from 'socket.io-client';
 import SettingsContext from './contexts/SettingsContext';
+import Loading from './components/Loading';
 
 const socket = io(`http://${import.meta.env.VITE_HOST}:5174`);
 
@@ -32,19 +33,19 @@ export default function Client() {
       });
   };
 
+  if (settings == null) {
+    return <Loading />;
+  }
+
   return (
     <div className="flex flex-col h-svh">
-      {!loading && (
-        <>
-          <Routes>
-            <Route path="/" element={<ClientHome socket={socket} />} />
-            <Route path="/reminders" element={<ClientReminders selectedUserID={settings.defaultUserID} />} />
-            <Route path="/users" element={<ClientUsers data={users} fetchUsers={fetchUsers} settings={settings} />} />
-            <Route path="/settings" element={<ClientSettings socket={socket} />} />
-          </Routes>
-          <NavBar />
-        </>
-      )}
+      <Routes>
+        <Route path="/" element={<ClientHome socket={socket} />} />
+        <Route path="/reminders" element={<ClientReminders selectedUserID={settings.defaultUserID} />} />
+        <Route path="/users" element={<ClientUsers data={users} fetchUsers={fetchUsers} settings={settings} />} />
+        <Route path="/settings" element={<ClientSettings socket={socket} />} />
+      </Routes>
+      <NavBar />
     </div>
   );
 }

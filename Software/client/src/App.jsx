@@ -8,7 +8,7 @@ import { io } from 'socket.io-client';
 const socket = io(`http://${import.meta.env.VITE_HOST}:5174`);
 
 export default function App() {
-  const { fetchSettings, settings, loading } = useContext(SettingsContext);
+  const { fetchSettings, settings } = useContext(SettingsContext);
 
   useEffect(() => {
     socket.on('update', msg => {
@@ -24,7 +24,7 @@ export default function App() {
     <>
       <div className="flex flex-col h-screen overflow-hidden bg-neutral-900">
         <div className="grid md:grid-cols-7 text-neutral-50 flex-grow">
-          {!loading ? <Weather settings={settings} /> : null}
+          {settings ? <Weather settings={settings} /> : null}
           <Reminders />
           <News />
         </div>

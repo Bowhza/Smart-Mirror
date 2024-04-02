@@ -14,19 +14,31 @@ export default function Weather({ settings }) {
   //Use effect for the weather fetching
   useEffect(() => {
     const fetchData = async () => {
-      const response = await fetch(
-        `https://api.weatherapi.com/v1/forecast.json?key=${APIKey}&q=${location}&days=7&aqi=no&alerts=no`,
-        {
-          mode: 'cors',
-        },
-      );
-      const data = await response.json();
-      console.log(data);
-      setWeather(data);
+      try {
+        const response = await fetch(
+          `https://api.weatherapi.com/v1/forecast.json?key=${APIKey}&q=${location}&days=7&aqi=no&alerts=no`,
+          {
+            mode: 'cors',
+          },
+        );
+        if (!response.ok) {
+          throw new Error('Failed to fetch data');
+        }
+        const data = await response.json();
+        console.log(data);
 
-      const conditionObj = conditions.find(item => item.code == data.current.condition.code);
-      const svgName = data.current.is_day ? conditionObj.day : conditionObj.night;
-      setSvg(`../svgs/${svgName}`);
+        // Check if data is present and has the expected structure
+        if (data && data.current && data.current.condition && data.current.condition.code) {
+          const conditionObj = conditions.find(item => item.code === data.current.condition.code);
+          const svgName = data.current.is_day ? conditionObj.day : conditionObj.night;
+          setSvg(`../svgs/${svgName}`);
+          setWeather(data);
+        } else {
+          console.error('Invalid data format:', data);
+        }
+      } catch (error) {
+        console.error('Error fetching weather data:', error);
+      }
     };
 
     // Fetch data immediately after component mounts
@@ -56,7 +68,7 @@ export default function Weather({ settings }) {
 
   return (
     <div className="flex-col m-2 md:col-span-2 font-bold p-3">
-      {weather.forecast ? (
+      {weather.forecast && weather.current ? (
         <>
           <WeatherDisplay weather={weather} Svg={Svg} currentTime={currentTime} settings={settings} />
           {showForecast ? <Forecast data={weather.forecast} /> : <Stats data={weather} />}

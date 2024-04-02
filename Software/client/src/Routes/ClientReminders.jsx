@@ -13,8 +13,14 @@ export default function ClientReminders({ selectedUserID }) {
     fetchReminders();
   }, [selectedUserID]);
 
-  const APIRequest = (path, method) => {
-    return fetch(`http://${hostIP}:5174/${path}`, { method })
+  const APIRequest = (path, method, body = {}) => {
+    return fetch(`http://${hostIP}:5174/${path}`, {
+      method,
+      headers: {
+        'Content-Type': 'application/json', // Specify the content type as JSON
+      },
+      body: JSON.stringify(body), // Convert the body object to JSON string
+    })
       .then(res => {
         setResponse(prev => ({ ...prev, color: res.ok ? 'green' : 'red' }));
         return res.json();
@@ -47,11 +53,17 @@ export default function ClientReminders({ selectedUserID }) {
     }
   };
 
+  const addReminder = ({ details }) => {
+    if (details) {
+      APIRequest(`add_reminder/${selectedUserID}`, 'POST', { details }).then(fetchReminders);
+    }
+  };
+
   return (
     <>
       <Header title="Reminders" />
       <div className="flex flex-col flex-grow p-3 gap-3 pb-24">
-        <AddReminder />
+        <AddReminder addReminder={addReminder} />
         <RemindersList reminders={reminders} deleteReminder={deleteReminder} />
         {showBanner && (
           <Notification
@@ -66,24 +78,83 @@ export default function ClientReminders({ selectedUserID }) {
   );
 }
 
-function AddReminder() {
+function AddReminder({ addReminder }) {
+  const [show, setShow] = useState(false);
+  const [details, setDetails] = useState({
+    title: '',
+    description: '',
+    startDate: '',
+    endDate: '',
+  });
+  const dateTimeLocal = new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000)
+    .toISOString()
+    .slice(0, 16);
+
+  const handleChange = e => {
+    const { name, value } = e.target;
+    setDetails(prevDetails => ({
+      ...prevDetails,
+      [name]: value,
+    }));
+  };
+
   return (
-    <div>
+    <div className="flex flex-col">
       <h2 className="font-bold text-2xl">Add Reminder</h2>
-      <h3 className="font-bold">Reminder Title</h3>
-      <input
-        className="border-2 w-full rounded-md h-10 shadow-sm focus:border-neutral-400 outline-none px-2 bg-neutral-100"
-        type="text"
-        name="reminder"
-        id="reminder"
-      />
-      <h3 className="font-bold">Reminder Description</h3>
-      <input
-        className="border-2 w-full rounded-md h-10 shadow-sm focus:border-neutral-400 outline-none px-2 bg-neutral-100"
-        type="text"
-        name="reminder"
-        id="reminder"
-      />
+      <div>
+        <h3 className="font-bold">Reminder Title</h3>
+        <input
+          className="border-2 w-full rounded-md h-10 shadow-sm focus:border-neutral-400 outline-none px-2 bg-neutral-100"
+          type="text"
+          name="reminder"
+          id="reminder"
+          onChange={handleChange}
+        />
+      </div>
+      <div>
+        <h3 className="font-bold">Reminder Description</h3>
+        <input
+          className="border-2 w-full rounded-md h-10 shadow-sm focus:border-neutral-400 outline-none px-2 bg-neutral-100"
+          type="text"
+          name="reminder"
+          id="reminder"
+          onChange={handleChange}
+        />
+      </div>
+      <div className="flex flex-col gap-1">
+        <div>
+          <p className="font-bold">Start Date</p>
+          <input
+            className="border-2 bg-neutral-100"
+            type="datetime-local"
+            name="start-date"
+            id="start-date"
+            onChange={handleChange}
+            defaultValue={dateTimeLocal}
+            min={dateTimeLocal}
+          />
+        </div>
+        <div>
+          <p className="font-bold">End Date</p>
+          <input
+            className="border-2 bg-neutral-100"
+            type="datetime-local"
+            name="end-date"
+            id="end-date"
+            onChange={handleChange}
+            min={dateTimeLocal}
+          />
+        </div>
+      </div>
+      <div className="pt-3">
+        <Button
+          text="Add Reminder"
+          color="bg-gradient-to-br from-emerald-400 to-emerald-600"
+          onClick={() => {
+            addReminder({ details }).then(setShow(false));
+          }}
+        />
+      </div>
     </div>
   );
 }

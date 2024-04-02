@@ -15,7 +15,7 @@ const Router = () => {
         console.log(data.ip);
       })
       .catch(error => console.log(error));
-  }, []);
+  }, [hostIP]);
 
   const router = createBrowserRouter([
     {
@@ -23,6 +23,7 @@ const Router = () => {
       element: ip === hostIP ? <App /> : <Client />,
     },
   ]);
+
   return <RouterProvider router={router} />;
 };
 

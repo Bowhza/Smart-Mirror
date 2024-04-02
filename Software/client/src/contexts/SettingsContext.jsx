@@ -4,21 +4,21 @@ const SettingsContext = createContext();
 
 export const SettingsProvider = ({ children }) => {
   const [settings, setSettings] = useState(null);
-  const [loading, setLoading] = useState(true);
 
   const fetchSettings = () => {
     const hostIP = import.meta.env.VITE_HOST;
-    setLoading(true);
     fetch(`http://${hostIP}:5174/get_settings`)
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) {
+          throw new Error('Failed to fetch settings');
+        }
+        return res.json();
+      })
       .then(data => {
-        console.log(data);
         setSettings(data);
-        setLoading(false);
       })
       .catch(error => {
         console.error('Error fetching settings:', error);
-        setLoading(false);
       });
   };
 
@@ -27,9 +27,7 @@ export const SettingsProvider = ({ children }) => {
   }, []);
 
   return (
-    <SettingsContext.Provider value={{ settings, setSettings, loading, fetchSettings }}>
-      {children}
-    </SettingsContext.Provider>
+    <SettingsContext.Provider value={{ settings, setSettings, fetchSettings }}>{children}</SettingsContext.Provider>
   );
 };
 
