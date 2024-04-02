@@ -6,7 +6,6 @@ export default function Weather({ settings }) {
   const APIKey = import.meta.env.VITE_API_KEY;
 
   const [weather, setWeather] = useState({});
-  const [location, setLocation] = useState(settings.defaultLocation);
   const [Svg, setSvg] = useState(null);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [showForecast, setShowForecast] = useState(false);
@@ -16,7 +15,7 @@ export default function Weather({ settings }) {
     const fetchData = async () => {
       try {
         const response = await fetch(
-          `https://api.weatherapi.com/v1/forecast.json?key=${APIKey}&q=${location}&days=7&aqi=no&alerts=no`,
+          `https://api.weatherapi.com/v1/forecast.json?key=${APIKey}&q=${settings.defaultLocation}&days=7&aqi=no&alerts=no`,
           {
             mode: 'cors',
           },
@@ -25,7 +24,6 @@ export default function Weather({ settings }) {
           throw new Error('Failed to fetch data');
         }
         const data = await response.json();
-        console.log(data);
 
         // Check if data is present and has the expected structure
         if (data && data.current && data.current.condition && data.current.condition.code) {
@@ -48,7 +46,7 @@ export default function Weather({ settings }) {
     const weatherFetch = setInterval(fetchData, 1000 * 60 * 5);
 
     return () => clearInterval(weatherFetch);
-  }, [location]);
+  }, [settings.defaultLocation]);
 
   //Use Effect for the clock and forecast intervals
   useEffect(() => {
