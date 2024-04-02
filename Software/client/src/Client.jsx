@@ -41,7 +41,10 @@ export default function Client() {
     <div className="flex flex-col h-svh">
       <Routes>
         <Route path="/" element={<ClientHome socket={socket} />} />
-        <Route path="/reminders" element={<ClientReminders selectedUserID={settings.defaultUserID} />} />
+        <Route
+          path="/reminders"
+          element={<ClientReminders selectedUserID={settings.defaultUserID} socket={socket} />}
+        />
         <Route path="/users" element={<ClientUsers data={users} fetchUsers={fetchUsers} settings={settings} />} />
         <Route path="/settings" element={<ClientSettings socket={socket} />} />
       </Routes>

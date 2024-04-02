@@ -24,8 +24,12 @@ export default function App() {
     <>
       <div className="flex flex-col h-screen overflow-hidden bg-neutral-900">
         <div className="grid md:grid-cols-7 text-neutral-50 flex-grow">
-          {settings ? <Weather settings={settings} /> : null}
-          <Reminders />
+          {settings ? (
+            <>
+              <Weather settings={settings} />
+              <Reminders userID={settings.defaultUserID} />
+            </>
+          ) : null}
           <News />
         </div>
       </div>

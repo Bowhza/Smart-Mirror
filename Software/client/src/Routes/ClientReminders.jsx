@@ -3,7 +3,7 @@ import Header from '../components/Header';
 import Button from '../components/Button';
 import Notification from '../components/Notification';
 
-export default function ClientReminders({ selectedUserID }) {
+export default function ClientReminders({ selectedUserID, socket }) {
   const hostIP = import.meta.env.VITE_HOST;
   const [reminders, setReminders] = useState([]);
   const [showBanner, setShowBanner] = useState(false);
@@ -15,6 +15,7 @@ export default function ClientReminders({ selectedUserID }) {
 
   const APIRequest = (path, method, body = {}) => {
     return fetch(`http://${hostIP}:5174/${path}`, {
+      mode: 'cors',
       method,
       headers: {
         'Content-Type': 'application/json', // Specify the content type as JSON
@@ -41,7 +42,6 @@ export default function ClientReminders({ selectedUserID }) {
     fetch(`http://${hostIP}:5174/get_reminders/${selectedUserID}`, { mode: 'cors' })
       .then(res => res.json())
       .then(data => {
-        console.log(data);
         setReminders(data);
       })
       .catch(error => console.log(error));
@@ -54,8 +54,11 @@ export default function ClientReminders({ selectedUserID }) {
   };
 
   const addReminder = ({ details }) => {
-    if (details) {
-      APIRequest(`add_reminder/${selectedUserID}`, 'POST', { details }).then(fetchReminders);
+    if (Object.values(details).every(x => x !== null && x !== '')) {
+      APIRequest(`add_reminder/${selectedUserID}`, 'POST', { ...details }).then(fetchReminders);
+    } else {
+      setResponse({ color: 'red', message: 'Fields cannot be left empty.' });
+      setShowBanner(true);
     }
   };
 
@@ -79,16 +82,15 @@ export default function ClientReminders({ selectedUserID }) {
 }
 
 function AddReminder({ addReminder }) {
-  const [show, setShow] = useState(false);
-  const [details, setDetails] = useState({
-    title: '',
-    description: '',
-    startDate: '',
-    endDate: '',
-  });
   const dateTimeLocal = new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000)
     .toISOString()
     .slice(0, 16);
+  const [details, setDetails] = useState({
+    title: '',
+    description: '',
+    startDate: dateTimeLocal,
+    endDate: '',
+  });
 
   const handleChange = e => {
     const { name, value } = e.target;
@@ -106,8 +108,8 @@ function AddReminder({ addReminder }) {
         <input
           className="border-2 w-full rounded-md h-10 shadow-sm focus:border-neutral-400 outline-none px-2 bg-neutral-100"
           type="text"
-          name="reminder"
-          id="reminder"
+          name="title"
+          id="title"
           onChange={handleChange}
         />
       </div>
@@ -116,8 +118,8 @@ function AddReminder({ addReminder }) {
         <input
           className="border-2 w-full rounded-md h-10 shadow-sm focus:border-neutral-400 outline-none px-2 bg-neutral-100"
           type="text"
-          name="reminder"
-          id="reminder"
+          name="description"
+          id="description"
           onChange={handleChange}
         />
       </div>
@@ -127,8 +129,8 @@ function AddReminder({ addReminder }) {
           <input
             className="border-2 bg-neutral-100"
             type="datetime-local"
-            name="start-date"
-            id="start-date"
+            name="startDate"
+            id="startDate"
             onChange={handleChange}
             defaultValue={dateTimeLocal}
             min={dateTimeLocal}
@@ -139,8 +141,8 @@ function AddReminder({ addReminder }) {
           <input
             className="border-2 bg-neutral-100"
             type="datetime-local"
-            name="end-date"
-            id="end-date"
+            name="endDate"
+            id="endDate"
             onChange={handleChange}
             min={dateTimeLocal}
           />
@@ -151,7 +153,7 @@ function AddReminder({ addReminder }) {
           text="Add Reminder"
           color="bg-gradient-to-br from-emerald-400 to-emerald-600"
           onClick={() => {
-            addReminder({ details }).then(setShow(false));
+            addReminder({ details });
           }}
         />
       </div>
@@ -171,9 +173,11 @@ function RemindersList({ reminders, deleteReminder }) {
                 key={index}
                 className="flex flex-col gap-2 py-2 px-3 rounded-md border-2 bg-neutral-100 drop-shadow-sm"
               >
-                <h2 className="font-bold text-xl">{reminder.eventTitle}</h2>
+                <h2 className="font-bold text-xl">{reminder.title}</h2>
+
+                <p className="font-bold">{reminder.description || 'No Description Available.'}</p>
                 <div className="flex gap-2">
-                  <p>Start: {reminder.dateAdded}</p>
+                  <p>Start: {reminder.startDate}</p>
                   <p>End: {reminder.endDate}</p>
                 </div>
                 <div className="flex gap-3">
