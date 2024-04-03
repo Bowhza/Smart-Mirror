@@ -49,13 +49,30 @@ export default function ClientReminders({ selectedUserID, socket }) {
 
   const deleteReminder = reminderID => {
     if (reminderID) {
-      APIRequest(`delete_reminder/${reminderID}`, 'DELETE').then(fetchReminders);
+      APIRequest(`delete_reminder/${reminderID}`, 'DELETE')
+        .then(() => {
+          fetchReminders();
+          socket.emit('reminders', 'Removed reminder from the database.');
+        })
+        .catch(error => {
+          setResponse({ color: 'red', message: error.message });
+          setShowBanner(true);
+        });
     }
   };
 
   const addReminder = ({ details }) => {
     if (Object.values(details).every(x => x !== null && x !== '')) {
-      APIRequest(`add_reminder/${selectedUserID}`, 'POST', { ...details }).then(fetchReminders);
+      APIRequest(`add_reminder/${selectedUserID}`, 'POST', { ...details })
+        .then(() => {
+          // Fetch reminders and emit socket event after successfully adding the reminder
+          fetchReminders();
+          socket.emit('reminders', 'Added Reminder to Database.');
+        })
+        .catch(error => {
+          setResponse({ color: 'red', message: error.message });
+          setShowBanner(true);
+        });
     } else {
       setResponse({ color: 'red', message: 'Fields cannot be left empty.' });
       setShowBanner(true);
@@ -110,6 +127,7 @@ function AddReminder({ addReminder }) {
           type="text"
           name="title"
           id="title"
+          placeholder="Finish the project."
           onChange={handleChange}
         />
       </div>
@@ -120,6 +138,7 @@ function AddReminder({ addReminder }) {
           type="text"
           name="description"
           id="description"
+          placeholder="Work on the smart mirror."
           onChange={handleChange}
         />
       </div>

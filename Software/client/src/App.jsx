@@ -6,19 +6,41 @@ import SettingsContext from './contexts/SettingsContext';
 import { io } from 'socket.io-client';
 
 const socket = io(`http://${import.meta.env.VITE_HOST}:5174`);
+const hostIP = import.meta.env.VITE_HOST;
 
 export default function App() {
   const { fetchSettings, settings } = useContext(SettingsContext);
+  const [reminders, setReminders] = useState([]);
 
   useEffect(() => {
+    // Fetch reminders immediately after component mounts
+    fetchReminders();
+
+    // Set up socket event listeners
     socket.on('update', msg => {
       fetchSettings();
     });
 
+    socket.on('reminders', response => {
+      console.log(response);
+      setReminders(response.reminders);
+    });
+
+    // Cleanup function to remove socket event listeners
     return () => {
       socket.off('update');
+      socket.off('reminders');
     };
   }, []);
+
+  function fetchReminders() {
+    fetch(`http://${hostIP}:5174/get_reminders/${settings.defaultUserID}`, { mode: 'cors' })
+      .then(res => res.json())
+      .then(data => {
+        setReminders(data);
+      })
+      .catch(error => console.log(error));
+  }
 
   return (
     <>
@@ -27,7 +49,7 @@ export default function App() {
           {settings ? (
             <>
               <Weather settings={settings} />
-              <Reminders userID={settings.defaultUserID} />
+              <Reminders reminders={reminders} />
             </>
           ) : null}
           <News />
