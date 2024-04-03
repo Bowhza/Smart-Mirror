@@ -250,6 +250,7 @@ def get_reminders(user_id):
     return jsonify(json_events), 200
 
 
+
 # Delete reminder from DB
 @app.route("/delete_reminder/<reminder_id>", methods=["DELETE"])
 def delete_reminder(reminder_id):
@@ -418,10 +419,18 @@ def handle_update(message):
     emit('update', f'Updated', broadcast=True)
 
 
-# @socketio.on('reminders')
-# def handle_reminder(message):
-#     print(f'Received Message: {message}')
-#     emit('reminder', f'Updated', broadcast=True)
+@socketio.on('reminders')
+def handle_reminders(message):
+    global properties
+
+    # Query the DB for all reminders tied to the provided userID
+    events = Reminders.query.filter_by(userID=properties["defaultUserID"]).all()
+
+    # Create the JSON reminder objects and store them in a list
+    json_events = [event.to_json() for event in events]
+
+    print(f'Received Message: {message}')
+    emit('reminders', {"message": message, "reminders": json_events}, broadcast=True)
 
 
 if __name__ == '__main__':

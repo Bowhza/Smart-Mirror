@@ -1,10 +1,10 @@
 {
-  "accelerometer": true,
-  "ambient": false,
-  "gesture": true,
-  "proximity": false,
-  "defaultLocation": "Afghanistan",
-  "defaultUser": "",
-  "defaultUserID": 4,
-  "timeFormat": "en-uk"
+  "accelerometer": false,
+  "ambient": true,
+  "gesture": false,
+  "proximity": true,
+  "defaultLocation": "Calgary",
+  "defaultUser": "Admin",
+  "defaultUserID": 1,
+  "timeFormat": "en-us"
 }
