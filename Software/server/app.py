@@ -1,9 +1,10 @@
 # Imports for required libraries and modules
 from flask import request, jsonify
-from config import socketio, db, app, SQLException, json
+from config import socketio, db, app, SQLException, json, Thread
 from flask_socketio import emit
 from models import Users, Reminders, datetime, timedelta
 import os
+from sensors import main_sensor_loop
 global properties
 
 
@@ -433,7 +434,7 @@ def handle_reminders(message):
     emit('reminders', {"message": message, "reminders": json_events}, broadcast=True)
 
 
-if __name__ == '__main__':
+def read_properties():
     try:
         current_directory = os.path.dirname(os.path.abspath(__file__))
         print(current_directory)
@@ -441,12 +442,25 @@ if __name__ == '__main__':
         file_path = os.path.join(current_directory, "properties.json")
         json_file = open(file_path, "r")
         json_data = json_file.read()
-        properties = json.loads(json_data)
-        print(str(properties))
+        return json.loads(json_data)
 
     except Exception as ex:
         print("Cannot load JSON file!")
+        return None
+
+
+if __name__ == '__main__':
+    properties = read_properties()
+    
     # Create the DB model
     with app.app_context():
         db.create_all()
-    socketio.run(app, debug=True, host="0.0.0.0", port=5174, allow_unsafe_werkzeug=True)
+
+    try:
+        sensor_thread = Thread(target=main_sensor_loop, daemon=True)
+        sensor_thread.start()
+    except Exception as ex:
+        print(ex)
+    
+    with app.app_context():
+        socketio.run(app, debug=True, host="0.0.0.0", port=5174, allow_unsafe_werkzeug=True)

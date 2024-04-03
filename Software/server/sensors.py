@@ -6,6 +6,7 @@ import screen_brightness_control as sbc
 import monitorcontrol as mc
 from time import sleep
 from config import os, json
+from app import read_properties
 
 # Initialize devices
 # PIR sensor and pot from ADC
@@ -73,16 +74,7 @@ def display_on():
 
 def main_sensor_loop():
     while True:
-        try:
-            current_directory = os.path.dirname(os.path.abspath(__file__))
-            print(current_directory)
-            # Construct the relative path to properties.json
-            file_path = os.path.join(current_directory, "properties.json")
-            json_file = open(file_path, "r")
-            json_data = json_file.read()
-            properties = json.loads(json_data)
-        except Exception as ex:
-            print("Cannot load JSON file!")
+        properties = read_properties()
 
         sleep(1)
         pir_voltage = round(PIR.value * 3.30, 3)
@@ -95,32 +87,35 @@ def main_sensor_loop():
         print(f'POT Voltage: {pot_voltage}V')
 
         # PIR sensor 
-        if pir_voltage >= pot_voltage:
-            seconds = 0
-            LED.on()
-            display_on()
-        
-        else:
-            seconds+=1
-            if seconds >= 5:
-                LED.off()
-                display_off()
-
-        # Brightness adjustment
-        try:
-            if lightVal >= 1500:
-                lightVal = 1500
-
-            brightness = (100/1500) * lightVal
-            sbc.set_brightness(brightness)
-            
-            print(f'Brightness: {sbc.get_brightness()}')
-        except Exception as ex:
-            print("Cannot set or read brightness, Monitor is off.")
-
-        # Toggle display state on wave
-        if gesture == 9:
-            if display_state():
-                display_off()
-            else:
+        if properties["proximity"] is True:
+            if pir_voltage >= pot_voltage:
+                seconds = 0
+                LED.on()
                 display_on()
+            
+            else:
+                seconds+=1
+                if seconds >= 5:
+                    LED.off()
+                    display_off()
+
+        if properties["ambient"] is True:
+            # Brightness adjustment
+            try:
+                if lightVal >= 1500:
+                    lightVal = 1500
+
+                brightness = (100/1500) * lightVal
+                sbc.set_brightness(brightness)
+                
+                print(f'Brightness: {sbc.get_brightness()}')
+            except Exception as ex:
+                print("Cannot set or read brightness, Monitor is off.")
+
+        if properties["gesture"] is True:
+            # Toggle display state on wave
+            if gesture == 9:
+                if display_state():
+                    display_off()
+                else:
+                    display_on()
