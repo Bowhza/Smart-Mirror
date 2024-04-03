@@ -17,7 +17,7 @@ const socket = io(`http://${import.meta.env.VITE_HOST}:5174`);
 
 export default function Client() {
   const [users, setUsers] = useState([]);
-  const { settings, setSettings, loading } = useContext(SettingsContext);
+  const { settings, setSettings } = useContext(SettingsContext);
   const hostIP = import.meta.env.VITE_HOST;
 
   useEffect(() => {
@@ -30,6 +30,7 @@ export default function Client() {
       .then(data => {
         setUsers(data);
         setSettings({ ...settings, defaultUser: data.default, defaultUserID: data.id });
+        socket.emit('reminders', 'Refresh Reminders.');
       });
   };
 

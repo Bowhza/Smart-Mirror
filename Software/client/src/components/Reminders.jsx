@@ -20,9 +20,7 @@ export default function Reminders({ reminders }) {
         {displayedReminders.length === 0 ? (
           <p className="font-bold">No reminders to display.</p>
         ) : (
-          displayedReminders.map(reminder => (
-            <Reminder key={reminder.id} {...reminder} /> // Assuming each reminder has a unique 'id' property
-          ))
+          displayedReminders.map(reminder => <Reminder key={reminder.reminderID} {...reminder} />)
         )}
       </div>
     </div>
