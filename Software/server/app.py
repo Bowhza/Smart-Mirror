@@ -203,7 +203,7 @@ def check_user_exists(user_id):
 @app.route("/add_reminder/<user_id>", methods=["POST"])
 def add_reminder(user_id):
     if check_user_exists(user_id) is False:
-        return jsonify({"message": "user doesnt exist"}), 403
+        return jsonify({"message": "User Doesn't Exist"}), 403
     try:
         data = request.get_json()
         # date_string = data["startDate"]
@@ -212,15 +212,24 @@ def add_reminder(user_id):
         # print(date_part)
         # print(time_part)
 
-        event_title = data.get("reminderName")
-        start_date = datetime.strptime(data.get("startDate"), '%Y-%m-%d').date()
-        # start_date = datetime.strptime(date_part + " " + time_part + "+0000", "%Y-%m-%d %H:%M:%S.%f%z").date()
-        end_date = datetime.strptime(data.get("endDate"), '%Y-%m-%d').date()
+        for field in data:
+            if field is None:
+                return jsonify({"message": "Fields cannot be left empty"})
 
-        new_event = Reminders(user_id, event_title, start_date, end_date)
+        event_title = data.get("title")
+        event_desc = data.get("description")
+        start_date = datetime.strptime(data.get("startDate"), '%Y-%m-%dT%H:%M')
+        # start_date = datetime.strptime(data.get("startDate"), '%Y-%m-%d').date()
+        # start_date = datetime.strptime(date_part + " " + time_part + "+0000", "%Y-%m-%d %H:%M:%S.%f%z").date()
+        end_date = datetime.strptime(data.get("endDate"), '%Y-%m-%dT%H:%M')
+        # end_date = datetime.strptime(data.get("endDate"), '%Y-%m-%d').date()
+
+
+
+        new_event = Reminders(user_id, event_title, event_desc, start_date, end_date)
         db.session.add(new_event)
         db.session.commit()
-        return jsonify({"message": "event added"}), 200
+        return jsonify({"message": "Reminder Added!"}), 200
     except SQLException.DatabaseError as ex:
         return jsonify({"message": f"{ex}"}), 400
 
@@ -269,6 +278,27 @@ def delete_user_reminders(user_id):
             db.session.commit()
     except SQLException.DatabaseError:
         return jsonify({"message": "user's events could not be deleted!"})
+
+
+@app.route("/update_reminder/<reminder_id>", methods=["PUT"])
+def update_reminder(reminder_id):
+    data = request.get_json()
+
+    for field in data:
+        if field is None:
+            return jsonify({"message": "Fields cannot be empty"})
+    try:
+        reminder = Reminders.query.filter_by(reminder_id=reminder_id)
+        if reminder is None:
+            return jsonify({"message": "Reminder doesn't exist!"})
+        reminder.event_title = data.get("title")
+        reminder.event_desc = data.get("description")
+        reminder.date_added = datetime.strptime(data.get("startDate"), '%Y-%m-%dT%H:%M')
+        reminder.end_date = datetime.strptime(data.get("endDate"), '%Y-%m-%dT%H:%M')
+        db.session.commit()
+        return jsonify({"message": "Reminder Updated!"})
+    except SQLException.DatabaseError as ex:
+        return jsonify({"message": "Reminder could not be updated!"})
 
 
 # Gets the IP of the device accessing the endpoint
@@ -386,6 +416,12 @@ def handle_disconnect():
 def handle_update(message):
     print(f'Received Message: {message}')
     emit('update', f'Updated', broadcast=True)
+
+
+# @socketio.on('reminders')
+# def handle_reminder(message):
+#     print(f'Received Message: {message}')
+#     emit('reminder', f'Updated', broadcast=True)
 
 
 if __name__ == '__main__':

@@ -1,10 +1,10 @@
 {
-  "accelerometer": false,
+  "accelerometer": true,
+  "ambient": false,
   "gesture": true,
   "proximity": false,
-  "ambient": true,
-  "defaultLocation": "Edmonton",
-  "defaultUser": "Bohdan",
-  "defaultUserID": 1,
+  "defaultLocation": "Afghanistan",
+  "defaultUser": "",
+  "defaultUserID": 4,
   "timeFormat": "en-uk"
 }
