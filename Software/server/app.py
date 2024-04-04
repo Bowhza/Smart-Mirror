@@ -7,6 +7,9 @@ import os
 from sensors import main_sensor_loop
 global properties
 
+current_directory = os.path.dirname(os.path.realpath(__file__))
+file_path = os.path.join(current_directory, "properties.json")
+
 
 # Main Route
 @app.route('/')
@@ -86,7 +89,7 @@ def delete_user(user_id):
                 properties["defaultUser"] = ""
 
             # write the new contents to the JSON file
-            with open("properties.json", "w") as file:
+            with open(file_path, "w") as file:
                 json.dump(properties, file, indent=2)
 
     # If a DB error occurs, return an error message
@@ -154,7 +157,7 @@ def set_user(user_id):
         properties["defaultUserID"] = user.userID
 
         # Write to the JSON file
-        with open("properties.json", "w") as file:
+        with open(file_path, "w") as file:
             json.dump(properties, file, indent=2)
 
         # Return a status message
@@ -330,7 +333,7 @@ def update_sensor_settings(sensor):
         properties[sensor] = not properties[sensor]
 
         # write the new contents to the JSON file
-        with open("properties.json", "w") as file:
+        with open(file_path, "w") as file:
             json.dump(properties, file, indent=2)
 
         # Return the new state of the sensor power
@@ -365,7 +368,7 @@ def update_location(location):
         properties["defaultLocation"] = location
 
         # write the new contents to the JSON file
-        with open("properties.json", "w") as file:
+        with open(file_path, "w") as file:
             json.dump(properties, file, indent=2)
 
         # Return the new state of the sensor power
@@ -387,7 +390,7 @@ def update_time_format(format):
     try:
         properties["timeFormat"] = format
 
-        with open("properties.json", "w") as file:
+        with open(file_path, "w") as file:
             json.dump(properties, file, indent=2)
         return jsonify(properties["timeFormat"]), 200
 
@@ -436,10 +439,12 @@ def handle_reminders(message):
 
 def read_properties():
     try:
-        current_directory = os.path.dirname(os.path.abspath(__file__))
+        # script_dir = os.path.dirname(__file__)
+        # current_directory = os.path.dirname(os.path.realpath(__file__))
+        # file_path = os.path.join(current_directory, "properties.json")
         print(current_directory)
         # Construct the relative path to properties.json
-        file_path = os.path.join(current_directory, "properties.json")
+        # file_path = os.path.join(current_directory, "properties.json")
         json_file = open(file_path, "r")
         json_data = json_file.read()
         return json.loads(json_data)
@@ -463,4 +468,4 @@ if __name__ == '__main__':
         print(ex)
     
     with app.app_context():
-        socketio.run(app, debug=True, host="0.0.0.0", port=5174, allow_unsafe_werkzeug=True)
+        socketio.run(app, debug=True, host="0.0.0.0", port=5174, allow_unsafe_werkzeug=True, use_reloader=False)

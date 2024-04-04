@@ -6,7 +6,6 @@ import screen_brightness_control as sbc
 import monitorcontrol as mc
 from time import sleep
 from config import os, json
-from app import read_properties
 
 # Initialize devices
 # PIR sensor and pot from ADC
@@ -14,7 +13,7 @@ PIR = MCP3008(0)
 POT = MCP3008(1)
 
 # LED on pin 17
-LED = LED(17)
+# LED = LED(17)
 
 # Ambient light sensot
 light = PiicoDev_VEML6030(addr=0x48)
@@ -25,9 +24,6 @@ g_sens.init()
 
 # Monitor
 monitor = mc.get_monitors()
-
-# Timeout int
-seconds = 0
 
 # Function that returns monitors current display state
 def display_state():
@@ -72,7 +68,25 @@ def display_on():
             except Exception as ex:
                 print(ex)
 
+
+def read_properties():
+    try:
+        current_directory = os.path.dirname(os.path.realpath(__file__))
+        file_path = os.path.join(current_directory, "properties.json")
+        print(current_directory)
+        # Construct the relative path to properties.json
+        # file_path = os.path.join(current_directory, "properties.json")
+        json_file = open(file_path, "r")
+        json_data = json_file.read()
+        return json.loads(json_data)
+
+    except Exception as ex:
+        print("Cannot load JSON file!")
+        return None
+
 def main_sensor_loop():
+    # Timeout int
+    seconds = 0
     while True:
         properties = read_properties()
 
@@ -88,18 +102,20 @@ def main_sensor_loop():
 
         # PIR sensor 
         if properties["proximity"] is True:
+            print("PIR On")
             if pir_voltage >= pot_voltage:
                 seconds = 0
-                LED.on()
+                # LED.on()
                 display_on()
             
             else:
                 seconds+=1
                 if seconds >= 5:
-                    LED.off()
+                    # LED.off()
                     display_off()
 
         if properties["ambient"] is True:
+            print("Ambient On")
             # Brightness adjustment
             try:
                 if lightVal >= 1500:
@@ -116,6 +132,6 @@ def main_sensor_loop():
             # Toggle display state on wave
             if gesture == 9:
                 if display_state():
-                    display_off()
+                   display_off()
                 else:
-                    display_on()
+                   display_on()

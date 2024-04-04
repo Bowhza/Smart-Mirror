@@ -1,8 +1,0 @@
-{
-  "accelerometer": false,
-  "gesture": false,
-  "proximity": false,
-  "ambient": false,
-  "defaultLocation": "Edmonton",
-  "defaultUser": "admin"
-}
