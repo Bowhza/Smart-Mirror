@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import Header from '../components/Header';
 import Button from '../components/Button';
 import Notification from '../components/Notification';
@@ -181,37 +181,79 @@ function AddReminder({ addReminder }) {
 }
 
 function RemindersList({ reminders, deleteReminder }) {
+  const touchStartX = useRef(null);
+  const swipeDistance = useRef(0);
+  const maxSwipeDistance = -100; // Maximum allowed swipe distance
+
+  const handleTouchStart = e => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchMove = (e, reminderID) => {
+    if (!touchStartX.current) return;
+
+    const touchEndX = e.touches[0].clientX;
+    swipeDistance.current = touchEndX - touchStartX.current;
+
+    // Limit the swipe distance
+    swipeDistance.current = Math.max(swipeDistance.current, maxSwipeDistance);
+
+    // Set the position of the swiped reminder
+    const swipedReminder = document.getElementById(`reminder-${reminderID}`);
+    if (swipedReminder && swipeDistance.current < 0) {
+      swipedReminder.style.transform = `translateX(${swipeDistance.current}px)`;
+    }
+  };
+
+  const handleTouchEnd = reminderID => {
+    // Check if swipe distance is sufficient for deletion
+    if (swipeDistance.current <= maxSwipeDistance + 10) {
+      deleteReminder(reminderID);
+    }
+
+    // Reset swipe distance and touch start position
+    swipeDistance.current = 0;
+    touchStartX.current = null;
+
+    // Reset reminder position
+    const swipedReminder = document.getElementById(`reminder-${reminderID}`);
+    if (swipedReminder) {
+      swipedReminder.style.transform = 'translateX(0)';
+    }
+  };
+
   return (
     <div className="grid grid-flow-row">
       <h2 className="font-bold text-2xl">Stored Reminders</h2>
       <div className="flex flex-col gap-3">
         {reminders && reminders.length > 0 ? (
           reminders.map((reminder, index) => {
+            const reminderID = reminder.reminderID;
+
             return (
               <div
                 key={index}
-                className="flex flex-col gap-2 py-2 px-3 rounded-md border-2 bg-neutral-100 drop-shadow-sm"
+                className="relative"
+                onTouchStart={e => handleTouchStart(e)}
+                onTouchMove={e => handleTouchMove(e, reminderID)}
+                onTouchEnd={() => handleTouchEnd(reminderID)}
+                style={{ transition: 'transform 0.3s ease' }}
               >
-                <h2 className="font-bold text-xl">{reminder.title}</h2>
-
-                <p className="font-bold">{reminder.description || 'No Description Available.'}</p>
-                <div className="flex gap-2">
-                  <p>Start: {reminder.startDate}</p>
-                  <p>End: {reminder.endDate}</p>
+                <div
+                  id={`reminder-${reminderID}`}
+                  className="flex flex-col gap-2 py-2 px-3 rounded-md border-2 bg-neutral-100 drop-shadow-sm"
+                >
+                  <h2 className="font-bold text-xl">{reminder.title}</h2>
+                  <p className="font-bold">{reminder.description || 'No Description Available.'}</p>
+                  <div className="flex justify-between">
+                    <p>Start: {reminder.startDate}</p>
+                    <p>End: {reminder.endDate}</p>
+                  </div>
                 </div>
-                <div className="flex gap-3">
-                  <Button
-                    className="flex-grow"
-                    text="Delete"
-                    color="bg-gradient-to-br from-rose-400 to-red-500"
-                    onClick={() => deleteReminder(reminder.reminderID)}
-                  />
-                  <Button
-                    className="flex-grow"
-                    text="Update"
-                    color="bg-gradient-to-br from-emerald-400 to-emerald-600"
-                    onClick={() => {}}
-                  />
+                <div className="absolute top-0 right-0 w-full h-full flex items-center justify-end pointer-events-none -z-10">
+                  <div className="bg-red-600 w-full h-full rounded-lg border-2 flex flex-col justify-center items-end pr-7">
+                    <span className="text-white font-semibold pointer-events-auto">Delete</span>
+                  </div>
                 </div>
               </div>
             );
