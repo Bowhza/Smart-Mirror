@@ -1,8 +1,8 @@
 {
   "accelerometer": false,
-  "ambient": false,
+  "ambient": true,
   "gesture": true,
-  "proximity": true,
+  "proximity": false,
   "defaultLocation": "Calgary",
   "defaultUser": "Admin",
   "defaultUserID": 1,

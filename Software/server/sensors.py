@@ -34,10 +34,12 @@ def display_state():
         # This will not work if the monitor is off 
         try:
             state = mon.get_power_mode()
+            print(state)
             return state
         
         # Print the error if it occurs
         except Exception as ex:
+            print("error")
             print(ex)
 
 # Function that turns off the monitor
@@ -131,7 +133,9 @@ def main_sensor_loop():
         if properties["gesture"] is True:
             # Toggle display state on wave
             if gesture == 9:
-                if display_state():
+                # print("wave!")
+                state = display_state()
+                if state == mc.PowerMode.on:
                    display_off()
                 else:
                    display_on()
