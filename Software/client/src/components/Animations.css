@@ -2,15 +2,19 @@
   animation: scrollAnimation 360s linear infinite;
 }
 
+.paused {
+  animation-play-state: paused;
+}
+
 @keyframes scrollAnimation {
   0% {
     transform: translateX(0);
   }
   40% {
-    transform: translateX(-78%);
+    transform: translateX(-80%);
   }
   50% {
-    transform: translateX(-78%);
+    transform: translateX(-80%);
   }
   90% {
     transform: translateX(0);

@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import './Animations.css';
 
 export default function News() {
   const [newsItems, setNewsItems] = useState([]);
+  const [isScrollingPaused, setIsScrollingPaused] = useState(false);
 
   useEffect(() => {
     const fetchNews = async () => {
@@ -45,20 +46,29 @@ export default function News() {
     fetchNews();
 
     //Fetches new news data every 10 minutes
-    const newsInterval = setInterval(
-      () => {
-        fetchNews();
-      },
-      1000 * 60 * 10,
-    );
+    const newsInterval = setInterval(fetchNews, 1000 * 60 * 10);
 
     //Cleanup function
     return () => clearInterval(newsInterval);
   }, []);
 
+  useEffect(() => {
+    function handleKeyDown(event) {
+      if (event.key === 's') {
+        setIsScrollingPaused(prevState => !prevState);
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+
   return (
     <div className="md:col-span-7 md:flex w-screen mx-5 mb-5 items-end container">
-      <div className="scrolling-container flex gap-5">
+      <div className={`scrolling-container flex gap-5 ${isScrollingPaused ? 'paused' : ''}`}>
         {newsItems ? (
           newsItems.map((article, index) => {
             return <Article key={index} info={article} />;
