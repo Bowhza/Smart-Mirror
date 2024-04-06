@@ -1,5 +1,5 @@
 .scrolling-container {
-  animation: scrollAnimation 360s linear infinite;
+  animation: scrollAnimation 300s linear infinite;
 }
 
 .paused {
@@ -11,10 +11,10 @@
     transform: translateX(0);
   }
   40% {
-    transform: translateX(-80%);
+    transform: translateX(calc(-100% + 98vw));
   }
   50% {
-    transform: translateX(-80%);
+    transform: translateX(calc(-100% + 98vw));
   }
   90% {
     transform: translateX(0);
