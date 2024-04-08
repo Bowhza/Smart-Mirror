@@ -1,14 +1,35 @@
 import { useEffect, useRef, useState, forwardRef } from 'react';
 
 const Reminder = forwardRef(({ index, title, description, startDate, endDate, isFocused }, ref) => {
+  const [isOverdue, setIsOverdue] = useState(false);
+
+  useEffect(() => {
+    const checkOverdueStatus = () => {
+      const currentDate = new Date();
+      const endDateTime = new Date(endDate);
+      const isPastDue = currentDate > endDateTime;
+      setIsOverdue(isPastDue);
+    };
+
+    //Initial check
+    checkOverdueStatus();
+
+    //Set up a timer to periodically check the overdue status
+    const timerId = setInterval(checkOverdueStatus, 20000); // Check every minute
+
+    return () => {
+      clearInterval(timerId); // Clean up the timer
+    };
+  }, [endDate]);
+
   return (
     <div
       ref={ref}
       className={`flex flex-col py-2 px-3 rounded-md border-2 bg-zinc-800 ${isFocused ? 'border-blue-500' : 'border-neutral-700'}`}
     >
-      <div className="flex justify-between">
+      <div className={`flex justify-between ${isOverdue && 'text-red-500'} `}>
         <p className="font-bold">{title}</p>
-        <p className="text-neutral-600 font-bold text-lg">{index + 1}</p>
+        <p className={`${isOverdue ? 'text-red-500' : 'text-neutral-500'} font-bold text-lg`}>{index + 1}</p>
       </div>
       <p>{description}</p>
       <div className="flex justify-between">
@@ -50,6 +71,8 @@ export default function Reminders({ reminders }) {
   } else {
     displayedReminders = reminders.slice(focusedIndex - 4, focusedIndex + 1);
   }
+
+  if (focusedIndex >= displayedReminders.length) setFocusedIndex(displayedReminders.length - 1);
 
   return (
     <div className="m-3 flex-col md:col-start-6 md:col-span-2 text-neutral-50">
