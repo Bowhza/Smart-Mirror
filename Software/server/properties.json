@@ -1,10 +1,10 @@
 {
-  "accelerometer": false,
-  "ambient": true,
+  "accelerometer": true,
+  "ambient": false,
   "gesture": true,
   "proximity": false,
   "defaultLocation": "Calgary",
-  "defaultUser": "Admin",
-  "defaultUserID": 1,
+  "defaultUser": "Keiren",
+  "defaultUserID": 2,
   "timeFormat": "en-us"
 }

@@ -6,6 +6,9 @@ import screen_brightness_control as sbc
 import monitorcontrol as mc
 from time import sleep
 from config import os, json
+import board
+import adafruit_adxl34x
+import pyautogui
 
 # Initialize devices
 # PIR sensor and pot from ADC
@@ -24,6 +27,12 @@ g_sens.init()
 
 # Monitor
 monitor = mc.get_monitors()
+
+#Accelerometer init
+i2c = board.I2C()
+accelerometer = adafruit_adxl34x.ADXL343(i2c)
+# accelerometer.enable_tap_detection(tap_count=2,threshold=20, duration=50)
+accelerometer.enable_tap_detection(tap_count=2, threshold=100, duration=50, latency=20, window=255)
 
 # Function that returns monitors current display state
 def display_state():
@@ -139,3 +148,26 @@ def main_sensor_loop():
                    display_off()
                 else:
                    display_on()
+            
+            if gesture == 5:
+                print("up")
+                pyautogui.press("up")
+
+            if gesture == 6:
+                print("down")
+                pyautogui.press("down")
+
+            if gesture == 4:
+                pyautogui.press("s")
+
+
+        if properties["accelerometer"]:
+            # print("%f %f %f" % accelerometer.acceleration)
+
+            if accelerometer.events["tap"]:
+                state = display_state()
+                if state == mc.PowerMode.on:
+                   display_off()
+                else:
+                   display_on()
+                # print("tapped")
