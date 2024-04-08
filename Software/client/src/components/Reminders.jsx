@@ -72,7 +72,7 @@ export default function Reminders({ reminders }) {
     displayedReminders = reminders.slice(focusedIndex - 4, focusedIndex + 1);
   }
 
-  if (focusedIndex >= displayedReminders.length) setFocusedIndex(displayedReminders.length - 1);
+  if (focusedIndex >= reminders.length) setFocusedIndex(reminders.length - 1);
 
   return (
     <div className="m-3 flex-col md:col-start-6 md:col-span-2 text-neutral-50">
