@@ -25,7 +25,7 @@ export default function ClientHome({ socket }) {
   return (
     <>
       <Header title="Home" />
-      <div className="flex flex-col flex-grow p-3 gap-2">
+      <div className="flex flex-col flex-grow p-3 gap-2 pb-24">
         <div className="py-2 px-3 rounded-md border-2 bg-neutral-100 drop-shadow-sm">
           <h2 className="font-bold text-2xl">Connection</h2>
           <p className="text-xl">
@@ -39,9 +39,9 @@ export default function ClientHome({ socket }) {
         </div>
 
         <div className="py-2 px-3 rounded-md border-2 bg-neutral-100 drop-shadow-sm">
-          <h2 className="font-bold text-2xl">Accelerometer Controls</h2>
+          <h2 className="font-bold text-2xl">Accelerometer</h2>
           <p>
-            <span className="font-bold">Double Tap</span> toggles the display ON/OFF.
+            <span className="font-bold">If Enabled, Double Tap</span> toggles the display ON/OFF.
           </p>
         </div>
 
@@ -52,12 +52,12 @@ export default function ClientHome({ socket }) {
             measured light (LUX) level.
           </p>
           <p>
-            <span className="font-bold">If Disabled</span> manual override for display brightness is available.
+            <span className="font-bold">If Disabled</span> the brightness percentage value in the settings tab is used.
           </p>
         </div>
 
         <div className="py-2 px-3 rounded-md border-2 bg-neutral-100 drop-shadow-sm">
-          <h2 className="font-bold text-2xl">Gesture Controls</h2>
+          <h2 className="font-bold text-2xl">Gesture Sensor</h2>
           <p>If the gesture sensor is enabled:</p>
           <p>
             <span className="font-bold">Wave</span> toggles the display ON/OFF.
