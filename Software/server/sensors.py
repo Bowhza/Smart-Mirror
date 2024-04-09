@@ -15,6 +15,9 @@ import pyautogui
 def pir_code():
     properties = read_properties()
     seconds = 0
+    if properties is None:
+        print("Properties could not be read!")
+        return
     try:
         PIR = MCP3008(0)
         POT = MCP3008(1)
@@ -22,28 +25,34 @@ def pir_code():
         print("ADC could not be initialized!")
         return
 
-    while True:
-        sleep(1)
-        pir_voltage = round(PIR.value * 3.30, 3)
-        pot_voltage = round(POT.value * 3.3, 3)
-        print(f'PIR Voltage: {pir_voltage}V')
-        print(f'POT Voltage: {pot_voltage}V')
-        # PIR sensor
-        if properties["proximity"] is True:
-            print("PIR On")
-            if pir_voltage >= pot_voltage:
-                seconds = 0
-                # LED.on()
-                display_on()
+    try:
+        while True:
+            sleep(1)
+            pir_voltage = round(PIR.value * 3.30, 3)
+            pot_voltage = round(POT.value * 3.3, 3)
+            print(f'PIR Voltage: {pir_voltage}V')
+            print(f'POT Voltage: {pot_voltage}V')
+            # PIR sensor
+            if properties["proximity"] is True:
+                print("PIR On")
+                if pir_voltage >= pot_voltage:
+                    seconds = 0
+                    # LED.on()
+                    display_on()
 
-            else:
-                seconds+=1
-                if seconds >= 5:
-                    # LED.off()
-                    display_off()
+                else:
+                    seconds += 1
+                    if seconds >= 5:
+                        # LED.off()
+                        display_off()
+    except Exception as ex:
+        print("PIR or ADC disconnected!")
 
 def ambient_code():
     properties = read_properties()
+    if properties is None:
+        print("Properties could not be read!")
+        return
     try:
         # Ambient light sensot
         light = PiicoDev_VEML6030(addr=0x48)
@@ -51,27 +60,34 @@ def ambient_code():
         print("Ambient Light Sensor could not be initialized!")
         return
 
-    while True:
-        sleep(0.5)
-        lightVal = light.read()
-        print(str(lightVal) + " lux")
-        if properties["ambient"] is True:
-            print("Ambient On")
-            # Brightness adjustment
-            try:
-                if lightVal >= 1500:
-                    lightVal = 1500
+    try:
+        while True:
+            sleep(0.5)
+            lightVal = light.read()
+            print(str(lightVal) + " lux")
+            if properties["ambient"] is True:
+                print("Ambient On")
+                # Brightness adjustment
+                try:
+                    if lightVal >= 1500:
+                        lightVal = 1500
 
-                brightness = (100 / 1500) * lightVal
-                sbc.set_brightness(brightness)
+                    brightness = (100 / 1500) * lightVal
+                    sbc.set_brightness(brightness)
 
-                print(f'Brightness: {sbc.get_brightness()}')
-            except Exception as ex:
-                print("Cannot set or read brightness, Monitor is off.")
+                    print(f'Brightness: {sbc.get_brightness()}')
+                except Exception as ex:
+                    print("Cannot set or read brightness, Monitor is off.")
+    except Exception as ex:
+        print("Ambient light sensor disconnected!")
+        return
 
 
 def gesture_code():
     properties = read_properties()
+    if properties is None:
+        print("Properties could not be read!")
+        return
     try:
         # Gesture sensor
         g_sens = ggs.gesture()
@@ -80,32 +96,39 @@ def gesture_code():
         print("Gesture Sensor could not be initialized!")
         return
 
-    while True:
-        sleep(0.5)
-        if properties["gesture"] is True:
-            gesture = g_sens.return_gesture()
-            # Toggle display state on wave
-            if gesture == 9:
-                # print("wave!")
-                state = display_state()
-                if state == mc.PowerMode.on:
-                    display_off()
-                else:
-                    display_on()
+    try:
+        while True:
+            sleep(0.5)
+            if properties["gesture"] is True:
+                gesture = g_sens.return_gesture()
+                # Toggle display state on wave
+                if gesture == 9:
+                    # print("wave!")
+                    state = display_state()
+                    if state == mc.PowerMode.on:
+                        display_off()
+                    else:
+                        display_on()
 
-            if gesture == 5:
-                print("up")
-                pyautogui.press("up")
+                if gesture == 5:
+                    print("up")
+                    pyautogui.press("up")
 
-            if gesture == 6:
-                print("down")
-                pyautogui.press("down")
+                if gesture == 6:
+                    print("down")
+                    pyautogui.press("down")
 
-            if gesture == 4:
-                pyautogui.press("s")
+                if gesture == 4:
+                    pyautogui.press("s")
+    except Exception as ex:
+        print("Gesture Sensor Disconnected!")
+        return
 
 def accelerometer_code():
     properties = read_properties()
+    if properties is None:
+        print("Properties could not be read!")
+        return
 
     try:
         # Accelerometer init
@@ -117,18 +140,22 @@ def accelerometer_code():
         print("Accelerometer could not be initialized!")
         return
 
-    while True:
-        sleep(0.5)
-        if properties["accelerometer"]:
-            # print("%f %f %f" % accelerometer.acceleration)
+    try:
+        while True:
+            sleep(0.5)
+            if properties["accelerometer"]:
+                # print("%f %f %f" % accelerometer.acceleration)
 
-            if accelerometer.events["tap"]:
-                state = display_state()
-                if state == mc.PowerMode.on:
-                    display_off()
-                else:
-                    display_on()
-                # print("tapped")
+                if accelerometer.events["tap"]:
+                    state = display_state()
+                    if state == mc.PowerMode.on:
+                        display_off()
+                    else:
+                        display_on()
+                    # print("tapped")
+    except Exception as ex:
+        print("Accelerometer Disconnected!")
+        return
 
 
 # Monitor
