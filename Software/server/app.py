@@ -4,7 +4,7 @@ from config import socketio, db, app, SQLException, json, Thread
 from flask_socketio import emit
 from models import Users, Reminders, datetime, timedelta
 import os
-from sensors import main_sensor_loop
+from sensors import pir_code, ambient_code, gesture_code, accelerometer_code
 global properties
 
 current_directory = os.path.dirname(os.path.realpath(__file__))
@@ -462,8 +462,18 @@ if __name__ == '__main__':
         db.create_all()
 
     try:
-        sensor_thread = Thread(target=main_sensor_loop, daemon=True)
-        sensor_thread.start()
+        proximity_thread = Thread(target=pir_code, daemon=True)
+        ambient_thread = Thread(target=ambient_code, daemon=True)
+        gesture_thread = Thread(target=gesture_code, daemon=True)
+        accelerometer_thread = Thread(target=accelerometer_code, daemon=True)
+
+        proximity_thread.start()
+        ambient_thread.start()
+        gesture_thread.start()
+        accelerometer_thread.start()
+
+        # sensor_thread = Thread(target=main_sensor_loop, daemon=True)
+        # sensor_thread.start()
     except Exception as ex:
         print(ex)
     
