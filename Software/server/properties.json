@@ -1,0 +1,12 @@
+{
+  "accelerometer": false,
+  "ambient": false,
+  "gesture": true,
+  "proximity": false,
+  "defaultLocation": "Calgary",
+  "defaultUser": "Admin",
+  "defaultUserID": 1,
+  "timeFormat": "en-uk",
+  "displayBrightness": 100,
+  "powerState": true
+}
