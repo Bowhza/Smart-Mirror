@@ -80,6 +80,28 @@ export default function ClientHome({ socket }) {
             automatically if no presence is detected for 5 seconds.
           </p>
         </div>
+        <div className="py-2 px-3 rounded-md border-2 bg-neutral-100 drop-shadow-sm">
+          <h2 className="font-bold text-2xl">Credits</h2>
+          <p>
+            Tab Icons:{' '}
+            <a className="font-bold text-blue-500" href="https://react-icons.github.io/react-icons/" target="_blank">
+              react-icons
+            </a>
+          </p>
+          <p>
+            Weather Icons:{' '}
+            <a className="font-bold text-blue-500" href="https://github.com/basmilius/weather-icons" target="_blank">
+              Meteocons
+            </a>
+          </p>
+          <p>
+            Weather API:{' '}
+            <a className="font-bold text-blue-500" href="https://www.weatherapi.com/" target="_blank">
+              weatherapi.com
+            </a>
+          </p>
+          <p className="font-bold">Developed by Bohdan Bohnat, Keiren Lawrence 2024</p>
+        </div>
       </div>
     </>
   );
