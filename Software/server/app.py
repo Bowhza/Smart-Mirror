@@ -4,7 +4,7 @@ from config import socketio, db, app, SQLException, json, Thread
 from flask_socketio import emit
 from models import Users, Reminders, datetime, timedelta
 import os
-from sensors import pir_code, ambient_code, gesture_code, accelerometer_code
+from sensors import pir_code, ambient_code, gesture_code, accelerometer_code, switch_states
 global properties
 
 current_directory = os.path.dirname(os.path.realpath(__file__))
@@ -100,7 +100,7 @@ def delete_user(user_id):
     return jsonify({"message": "User Deleted from Database!"}), 200
 
 # Clears everything in the DB
-@app.route("/clear_db")
+@app.route("/clear_db", methods=["DELETE"])
 def clear_db():
     # Attempt to clear the DB
     try:
@@ -112,15 +112,16 @@ def clear_db():
 
             # Grab the user id and delete the user
             # This will also delete any user reminders tied to the user id
-            user_id = user.userID
-            delete_user(user_id)
+            if user is not None:
+                user_id = user.userID
+                delete_user(user_id)
 
     # If a DB error occurs, return an error message
     except SQLException.DatabaseError as ex:
         return jsonify({"message": "users could not be deleted!"}), 403
 
     # Return a message stating the DB was cleared
-    return jsonify({"message": "Database cleared!"})
+    return jsonify({"message": "Database cleared!"}), 200
 
 
 # Get all current users in the DB
@@ -258,7 +259,7 @@ def get_reminders(user_id):
 # Delete reminder from DB
 @app.route("/delete_reminder/<reminder_id>", methods=["DELETE"])
 def delete_reminder(reminder_id):
-    # Attempt to delete the reminder from the DB
+    # Attempt to delete the reminder from the DBclear_db
     try:
         # Query the DB for the reminder and delete
         event = Reminders.query.filter_by(reminder_id=reminder_id).first()
@@ -363,6 +364,7 @@ def get_default_user_id():
 def update_location(location):
     global properties
     location = location.capitalize()
+    print(properties)
 
     try:
         properties["defaultLocation"] = location
@@ -374,10 +376,10 @@ def update_location(location):
         # Return the new state of the sensor power
         # True = enabled
         # False = disabled
-        return jsonify(properties["defaultLocation"])
+        return jsonify({"message": f"Location updated to {properties['defaultLocation']}"})
 
     except Exception as ex:
-        return jsonify({"message": "location cannot be updated!"})
+        return jsonify({"message": "Location cannot be updated!"})
 
 
 @app.route("/update_time_format/<format>", methods=["POST"])
@@ -392,10 +394,51 @@ def update_time_format(format):
 
         with open(file_path, "w") as file:
             json.dump(properties, file, indent=2)
-        return jsonify(properties["timeFormat"]), 200
+        return jsonify({"message": f"Time format updated to {properties['timeFormat']}!"}), 200
 
     except Exception as ex:
         return jsonify({"message": "Cannot Update Properties File!"}), 400
+    
+    
+@app.route("/set_brightness/<brightness>", methods=["POST"])
+def set_brightness(brightness):
+    global properties
+
+    if int(brightness) is False:
+        return jsonify({"message": "Brightness must be an int value!"}), 400
+
+    try:
+        properties["displayBrightness"] = int(brightness)
+        # write the new contents to the JSON file
+        with open(file_path, "w") as file:
+            json.dump(properties, file, indent=2)
+        # return jsonify(properties["defaultBrightness"]), 200
+
+    except Exception as ex:
+        return jsonify({"message": "Cannot Update Properties File!"}), 400
+    
+    return jsonify({"message": "Brightness updated!", "level": properties["displayBrightness"]}), 200
+
+
+@app.route("/change_display_state", methods=["POST"])
+def change_display_state():
+    response = switch_states()
+
+    properties = read_properties()
+    if response != "error":
+        return jsonify({"message": f"Display {response}", "state": properties["powerState"]}), 200
+    
+    return jsonify({"message": "Display state could not be switched!", "state": None}), 400
+
+# return jsonify({"users": json_users, "default": properties["defaultUser"], "id": properties["defaultUserID"]}), 200
+
+
+
+    
+
+
+
+
 
 
 # Websockets
@@ -442,7 +485,7 @@ def read_properties():
         # script_dir = os.path.dirname(__file__)
         # current_directory = os.path.dirname(os.path.realpath(__file__))
         # file_path = os.path.join(current_directory, "properties.json")
-        print(current_directory)
+        # print(current_directory)
         # Construct the relative path to properties.json
         # file_path = os.path.join(current_directory, "properties.json")
         json_file = open(file_path, "r")
@@ -456,6 +499,7 @@ def read_properties():
 
 if __name__ == '__main__':
     properties = read_properties()
+    print(properties)
     
     # Create the DB model
     with app.app_context():
