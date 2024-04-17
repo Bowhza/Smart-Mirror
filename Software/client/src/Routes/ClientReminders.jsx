@@ -13,6 +13,13 @@ export default function ClientReminders({ selectedUserID, socket }) {
     fetchReminders();
   }, [selectedUserID]);
 
+  /**
+   * Makes an API request.
+   * @param {string} path - API endpoint path.
+   * @param {string} method - HTTP method (GET, POST, PUT, DELETE, etc.).
+   * @param {Object} body - Request body.
+   * @returns {Promise} A Promise that resolves with the response data.
+   */
   const APIRequest = (path, method, body = {}) => {
     return fetch(`http://${hostIP}:5174/${path}`, {
       mode: 'cors',
@@ -38,6 +45,9 @@ export default function ClientReminders({ selectedUserID, socket }) {
       });
   };
 
+  /**
+   * Fetches reminders for the selected user.
+   */
   const fetchReminders = () => {
     fetch(`http://${hostIP}:5174/get_reminders/${selectedUserID}`, { mode: 'cors' })
       .then(res => res.json())
@@ -47,6 +57,10 @@ export default function ClientReminders({ selectedUserID, socket }) {
       .catch(error => console.log(error));
   };
 
+  /**
+   * Deletes a reminder.
+   * @param {string} reminderID - ID of the reminder to delete.
+   */
   const deleteReminder = reminderID => {
     if (reminderID) {
       APIRequest(`delete_reminder/${reminderID}`, 'DELETE')
@@ -61,11 +75,14 @@ export default function ClientReminders({ selectedUserID, socket }) {
     }
   };
 
+  /**
+   * Adds a new reminder.
+   * @param {Object} param0 - Reminder details.
+   */
   const addReminder = ({ details }) => {
     if (Object.values(details).every(x => x !== null && x !== '')) {
       APIRequest(`add_reminder/${selectedUserID}`, 'POST', { ...details })
         .then(() => {
-          // Fetch reminders and emit socket event after successfully adding the reminder
           fetchReminders();
           socket.emit('reminders', 'Added Reminder to Database.');
         })
@@ -98,6 +115,11 @@ export default function ClientReminders({ selectedUserID, socket }) {
   );
 }
 
+/**
+ * AddReminder component for adding new reminders.
+ * @param {Object} props - Component props.
+ * @param {Function} props.addReminder - Function to add a new reminder.
+ */
 function AddReminder({ addReminder }) {
   const dateTimeLocal = new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000)
     .toISOString()
@@ -109,6 +131,10 @@ function AddReminder({ addReminder }) {
     endDate: '',
   });
 
+  /**
+   * Handles input change for reminder details.
+   * @param {Object} e - Input change event.
+   */
   const handleChange = e => {
     const { name, value } = e.target;
     setDetails(prevDetails => ({

@@ -24,7 +24,7 @@ export default function Client() {
     fetchUsers();
   }, []);
 
-  const fetchUsers = () => {
+  function fetchUsers() {
     fetch(`http://${hostIP}:5174/get_users`, { mode: 'cors', method: 'GET' })
       .then(res => res.json())
       .then(data => {
@@ -32,7 +32,7 @@ export default function Client() {
         setSettings({ ...settings, defaultUser: data.default, defaultUserID: data.id });
         socket.emit('reminders', 'Refresh Reminders.');
       });
-  };
+  }
 
   if (settings == null) {
     return <Loading />;

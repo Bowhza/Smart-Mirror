@@ -4,7 +4,7 @@ from config import socketio, db, app, SQLException, json, Thread
 from flask_socketio import emit
 from models import Users, Reminders, datetime, timedelta
 import os
-from sensors import pir_code, ambient_code, gesture_code, accelerometer_code, switch_states
+#from sensors import pir_code, ambient_code, gesture_code, accelerometer_code, switch_states
 global properties
 
 current_directory = os.path.dirname(os.path.realpath(__file__))
@@ -211,11 +211,6 @@ def add_reminder(user_id):
         return jsonify({"message": "User Doesn't Exist"}), 403
     try:
         data = request.get_json()
-        # date_string = data["startDate"]
-        # date_part, time_part = date_string.split("T")
-        # print(date_string)
-        # print(date_part)
-        # print(time_part)
 
         for field in data:
             if field is None:
@@ -432,15 +427,6 @@ def change_display_state():
 
 # return jsonify({"users": json_users, "default": properties["defaultUser"], "id": properties["defaultUserID"]}), 200
 
-
-
-    
-
-
-
-
-
-
 # Websockets
 
 # Set to store the connected clients
@@ -505,21 +491,21 @@ if __name__ == '__main__':
     with app.app_context():
         db.create_all()
 
-    try:
-        proximity_thread = Thread(target=pir_code, daemon=True)
-        ambient_thread = Thread(target=ambient_code, daemon=True)
-        gesture_thread = Thread(target=gesture_code, daemon=True)
-        accelerometer_thread = Thread(target=accelerometer_code, daemon=True)
+    # try:
+    #     proximity_thread = Thread(target=pir_code, daemon=True)
+    #     ambient_thread = Thread(target=ambient_code, daemon=True)
+    #     gesture_thread = Thread(target=gesture_code, daemon=True)
+    #     accelerometer_thread = Thread(target=accelerometer_code, daemon=True)
 
-        proximity_thread.start()
-        ambient_thread.start()
-        gesture_thread.start()
-        accelerometer_thread.start()
+    #     proximity_thread.start()
+    #     ambient_thread.start()
+    #     gesture_thread.start()
+    #     accelerometer_thread.start()
 
-        # sensor_thread = Thread(target=main_sensor_loop, daemon=True)
-        # sensor_thread.start()
-    except Exception as ex:
-        print(ex)
+    #     # sensor_thread = Thread(target=main_sensor_loop, daemon=True)
+    #     # sensor_thread.start()
+    # except Exception as ex:
+    #     print(ex)
     
     with app.app_context():
         socketio.run(app, debug=True, host="0.0.0.0", port=5174, allow_unsafe_werkzeug=True, use_reloader=False)

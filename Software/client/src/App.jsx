@@ -3,7 +3,6 @@ import Reminders from './components/Reminders';
 import News from './components/News';
 import { useContext, useState, useEffect } from 'react';
 import SettingsContext from './contexts/SettingsContext';
-import Loading from './components/Loading';
 import { io } from 'socket.io-client';
 
 const socket = io(`http://${import.meta.env.VITE_HOST}:5174`);

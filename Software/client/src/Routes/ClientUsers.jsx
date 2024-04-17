@@ -1,7 +1,7 @@
 import Header from '../components/Header';
 import ButtonedInput from '../components/ButtonedInput';
 import Notification from '../components/Notification';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Button from '../components/Button';
 
 export default function ClientUsers({ data, fetchUsers, settings }) {
@@ -9,6 +9,12 @@ export default function ClientUsers({ data, fetchUsers, settings }) {
   const [response, setResponse] = useState({});
   const [showBanner, setShowBanner] = useState(false);
 
+  /**
+   * Handles API requests.
+   * @param {string} path - API endpoint path.
+   * @param {string} method - HTTP method.
+   * @returns {Promise<void>}
+   */
   const handleAPIRequest = (path, method) => {
     return fetch(`http://${hostIP}:5174/${path}`, { method })
       .then(res => {
@@ -26,18 +32,30 @@ export default function ClientUsers({ data, fetchUsers, settings }) {
       });
   };
 
+  /**
+   * Adds a new user.
+   * @param {string} Username - Username of the new user.
+   */
   const AddUser = Username => {
     if (Username.trim().length > 0) {
       handleAPIRequest(`add_user/${Username}`, 'POST').then(fetchUsers);
     }
   };
 
+  /**
+   * Sets the active user.
+   * @param {string} userID - ID of the user to set as active.
+   */
   const setUser = userID => {
     if (userID) {
       handleAPIRequest(`set_user/${userID}`, 'POST').then(fetchUsers);
     }
   };
 
+  /**
+   * Deletes a user.
+   * @param {string} userID - ID of the user to delete.
+   */
   const deleteUser = userID => {
     if (userID) {
       handleAPIRequest(`delete_user/${userID}`, 'DELETE').then(fetchUsers);
@@ -76,7 +94,9 @@ export default function ClientUsers({ data, fetchUsers, settings }) {
                     className="flex justify-between items-center border-2 p-2 rounded-md drop-shadow-sm bg-neutral-100"
                   >
                     <h3
-                      className={`font-bold text-lg drop-shadow-lg ${settings.defaultUser === item.userName && 'text-green-600'}`}
+                      className={`font-bold text-lg drop-shadow-lg ${
+                        settings.defaultUser === item.userName && 'text-green-600'
+                      }`}
                     >
                       {item.userName}
                     </h3>

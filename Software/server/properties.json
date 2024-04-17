@@ -3,7 +3,7 @@
   "ambient": false,
   "gesture": true,
   "proximity": false,
-  "defaultLocation": "Calgary",
+  "defaultLocation": "Edmonton",
   "defaultUser": "Admin",
   "defaultUserID": 1,
   "timeFormat": "en-uk",

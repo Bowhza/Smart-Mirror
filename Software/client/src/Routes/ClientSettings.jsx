@@ -15,6 +15,9 @@ export default function ClientSettings({ socket }) {
   const [showBanner, setShowBanner] = useState(false);
   const hostIP = import.meta.env.VITE_HOST;
 
+  /**
+   * Handles the toggle of time format between 12-hour and 24-hour.
+   */
   const handleToggle = () => {
     const newIs24Hour = !is24Hour;
 
@@ -37,6 +40,10 @@ export default function ClientSettings({ socket }) {
       });
   };
 
+  /**
+   * Updates the default location for weather.
+   * @param {string} value - New default location value.
+   */
   const updateLocation = value => {
     if (value.length > 0) {
       fetch(`http://${hostIP}:5174/update_location/${value}`)
@@ -57,6 +64,9 @@ export default function ClientSettings({ socket }) {
     }
   };
 
+  /**
+   * Updates the display state.
+   */
   const updateDisplay = () => {
     fetch(`http://${hostIP}:5174/change_display_state`, { method: 'POST' })
       .then(res => {
@@ -74,6 +84,10 @@ export default function ClientSettings({ socket }) {
       });
   };
 
+  /**
+   * Updates the display brightness.
+   * @param {number} value - New brightness level.
+   */
   const updateBrightness = value => {
     fetch(`http://${hostIP}:5174/set_brightness/${value}`, { method: 'POST' })
       .then(res => {
@@ -91,6 +105,9 @@ export default function ClientSettings({ socket }) {
       });
   };
 
+  /**
+   * Clears the database.
+   */
   const clearDatabase = () => {
     fetch(`http://${hostIP}:5174/clear_db`, { method: 'DELETE', mode: 'cors' })
       .then(res => {
