@@ -6,10 +6,10 @@ from models import Users, Reminders, datetime, timedelta
 import os
 from sensors import pir_code, ambient_code, gesture_code, accelerometer_code, switch_states
 global properties
+import subprocess
 
 current_directory = os.path.dirname(os.path.realpath(__file__))
 file_path = os.path.join(current_directory, "properties.json")
-
 
 # Main Route
 @app.route('/')
@@ -485,7 +485,6 @@ def read_properties():
 
 if __name__ == '__main__':
     properties = read_properties()
-    print(properties)
     
     # Create the DB model
     with app.app_context():
@@ -501,6 +500,12 @@ if __name__ == '__main__':
         ambient_thread.start()
         gesture_thread.start()
         accelerometer_thread.start()
+
+        react_app_dir = "/home/pi/Desktop/CMPE2965/Software/client"
+        subprocess.Popen(["npm run dev -- --host"], cwd=react_app_dir, shell=True)
+
+        command = "chromium-browser --kiosk http://172.20.10.3:5173"
+        subprocess.Popen(command, shell=True)
 
         # sensor_thread = Thread(target=main_sensor_loop, daemon=True)
         # sensor_thread.start()
