@@ -6,7 +6,7 @@ from models import Users, Reminders, datetime, timedelta
 import os
 from sensors import pir_code, ambient_code, gesture_code, accelerometer_code, switch_states
 global properties
-import subprocess
+import subprocess, time, keyboard
 
 current_directory = os.path.dirname(os.path.realpath(__file__))
 file_path = os.path.join(current_directory, "properties.json")
@@ -483,6 +483,44 @@ def read_properties():
         return None
 
 
+def get_ipv4_address():
+    try:
+        # Run the ifconfig command to get network interface information
+        result = subprocess.run(['ifconfig'], capture_output=True, text=True)
+        
+        # Parse the output to find the IPv4 address
+        output_lines = result.stdout.split('\n')
+        for line in output_lines:
+            if 'inet ' in line and '127.0.0.1' not in line:
+                ipv4_address = line.split()[1]
+                return ipv4_address
+        return None
+    except Exception as e:
+        print("Error:", e)
+        return None
+
+
+def update_env_file(property_name, new_value):
+    env_file_path = 'client/.env'
+
+    # Read the existing environment variables from the file
+    with open(env_file_path, 'r') as file:
+        lines = file.readlines()
+
+    # Find and update the specified property
+    updated_lines = []
+    for line in lines:
+        key, value = line.strip().split('=', 1)
+        if key == property_name:
+            updated_lines.append(f"{key}={new_value}\n")
+        else:
+            updated_lines.append(line)
+
+    # Write the updated environment variables back to the file
+    with open(env_file_path, 'w') as file:
+        file.writelines(updated_lines)
+
+
 if __name__ == '__main__':
     properties = read_properties()
     
@@ -491,6 +529,7 @@ if __name__ == '__main__':
         db.create_all()
 
     try:
+        """
         proximity_thread = Thread(target=pir_code, daemon=True)
         ambient_thread = Thread(target=ambient_code, daemon=True)
         gesture_thread = Thread(target=gesture_code, daemon=True)
@@ -500,15 +539,19 @@ if __name__ == '__main__':
         ambient_thread.start()
         gesture_thread.start()
         accelerometer_thread.start()
-
+        """
+        
         react_app_dir = "/home/pi/Desktop/CMPE2965/Software/client"
         subprocess.Popen(["npm run dev -- --host"], cwd=react_app_dir, shell=True)
 
-        command = "chromium-browser --kiosk http://172.20.10.3:5173"
+        ipv4_address = get_ipv4_address()
+
+        update_env_file("VITE_HOST", f"{ipv4_address}")
+
+        command = f"chromium-browser http://{ipv4_address}:5173 --kiosk"
         subprocess.Popen(command, shell=True)
 
-        # sensor_thread = Thread(target=main_sensor_loop, daemon=True)
-        # sensor_thread.start()
+
     except Exception as ex:
         print(ex)
     

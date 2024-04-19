@@ -8,7 +8,7 @@ from time import sleep
 from config import os, json
 import board
 import adafruit_adxl34x
-import pyautogui
+import keyboard
 
 current_directory = os.path.dirname(os.path.realpath(__file__))
 file_path = os.path.join(current_directory, "properties.json")
@@ -132,14 +132,16 @@ def gesture_code():
 
                 if gesture == 5:
                     print("up")
-                    pyautogui.press("up")
+                    keyboard.press_and_release("up")
 
                 if gesture == 6:
                     print("down")
-                    pyautogui.press("down")
+                    keyboard.press_and_release("down")
 
                 if gesture == 4:
-                    pyautogui.press("s")
+                    print("Stop")
+                    keyboard.press_and_release("s")
+
     except Exception as ex:
         print("Gesture Sensor Disconnected!")
         return
@@ -280,79 +282,3 @@ def read_properties():
     except Exception as ex:
         print("Cannot load JSON file!")
         return None
-
-# def main_sensor_loop():
-#     # Timeout int
-#     while True:
-#         properties = read_properties()
-#
-#         sleep(1)
-#         pir_voltage = round(PIR.value * 3.30, 3)
-#         pot_voltage = round(POT.value * 3.3, 3)
-#         lightVal = light.read()
-#         gesture = g_sens.return_gesture()
-#
-#         # print(str(lightVal) + " lux")
-#         # print(f'PIR Voltage: {pir_voltage}V')
-#         # print(f'POT Voltage: {pot_voltage}V')
-#
-#         # # PIR sensor
-#         # if properties["proximity"] is True:
-#         #     print("PIR On")
-#         #     if pir_voltage >= pot_voltage:
-#         #         seconds = 0
-#         #         # LED.on()
-#         #         display_on()
-#         #
-#         #     else:
-#         #         seconds+=1
-#         #         if seconds >= 5:
-#         #             # LED.off()
-#         #             display_off()
-#
-#         # if properties["ambient"] is True:
-#         #     print("Ambient On")
-#         #     # Brightness adjustment
-#         #     try:
-#         #         if lightVal >= 1500:
-#         #             lightVal = 1500
-#         #
-#         #         brightness = (100/1500) * lightVal
-#         #         sbc.set_brightness(brightness)
-#         #
-#         #         print(f'Brightness: {sbc.get_brightness()}')
-#         #     except Exception as ex:
-#         #         print("Cannot set or read brightness, Monitor is off.")
-#
-#         # if properties["gesture"] is True:
-#         #     # Toggle display state on wave
-#         #     if gesture == 9:
-#         #         # print("wave!")
-#         #         state = display_state()
-#         #         if state == mc.PowerMode.on:
-#         #            display_off()
-#         #         else:
-#         #            display_on()
-#         #
-#         #     if gesture == 5:
-#         #         print("up")
-#         #         pyautogui.press("up")
-#         #
-#         #     if gesture == 6:
-#         #         print("down")
-#         #         pyautogui.press("down")
-#         #
-#         #     if gesture == 4:
-#         #         pyautogui.press("s")
-#
-#
-#         # if properties["accelerometer"]:
-#         #     # print("%f %f %f" % accelerometer.acceleration)
-#         #
-#         #     if accelerometer.events["tap"]:
-#         #         state = display_state()
-#         #         if state == mc.PowerMode.on:
-#         #            display_off()
-#         #         else:
-#         #            display_on()
-#         #         # print("tapped")
